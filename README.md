@@ -112,6 +112,6 @@ Se o **Aircraft Sim Manager** facilitou a sua simulação de voo e você gostari
 
 ---
 
-### 🌐 International Donations (PayPal)
+### 🌐 International Donations (Ko-fi)
 
 [![Ko-Fi](https://img.shields.io/badge/Ko--fi-Donate%20a%20Coffee-red?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/aircraftsimmanager)
