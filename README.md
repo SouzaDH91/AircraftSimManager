@@ -73,7 +73,7 @@ Se o **Aircraft Sim Manager** facilitou a sua simulação de voo e você gostari
 
 #### 🇧🇷 Doação via PIX (Brasil)
 
-> **Chave PIX**: `sua-chave-pix-aqui@email.com`
+> **Chave PIX**: `35bc9f24-7e9a-4b6b-94a8-2474a62efe39`
 
 ---
 
@@ -111,4 +111,4 @@ Se o **Aircraft Sim Manager** facilitou a sua simulação de voo e você gostari
 
 ### 🌐 International Donations (PayPal)
 
-[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=SEU_ID_PAYPAL)
+[![Ko-Fi](https://img.shields.io/badge/Ko--fi-Donate%20a%20Coffee-red?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/aircraftsimmanager)
