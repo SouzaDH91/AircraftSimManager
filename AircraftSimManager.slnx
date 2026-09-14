@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AircraftSimManager.Data/AircraftSimManager.Data.csproj" />
+  <Project Path="AircraftSimManager.Utils/AircraftSimManager.Utils.csproj" />
+  <Project Path="AircraftSimManager/AircraftSimManager.csproj" />
+</Solution>

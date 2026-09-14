@@ -1,0 +1,112 @@
+<Window x:Class="AircraftSimManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AircraftSimManager.ViewModels"
+        xmlns:views="clr-namespace:AircraftSimManager.Views"
+        mc:Ignorable="d"
+        Title="Aircraft Sim Manager" Height="750" Width="1100"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E">
+
+    <Window.Resources>
+        <!-- Mapeamento automático da ViewModel para a View correspondente -->
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:LiveryManagerViewModel}">
+            <views:LiveryManagerView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:IncomingViewModel}">
+            <views:IncomingView />
+        </DataTemplate>
+
+        <!-- Estilo Dark para Separator dentro do Menu -->
+        <Style TargetType="{x:Type Separator}">
+            <Setter Property="Background" Value="#3F3F46"/>
+            <Setter Property="Margin" Value="4,3"/>
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Separator}">
+                        <Border Height="1" Background="{TemplateBinding Background}" Margin="{TemplateBinding Margin}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo Dark para MenuItems e Dropdowns -->
+        <Style TargetType="{x:Type MenuItem}">
+            <Setter Property="Background" Value="#252526"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                        <Border x:Name="Border" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <ContentPresenter ContentSource="Header" 
+                                                  RecognizesAccessKey="True" 
+                                                  VerticalAlignment="Center" 
+                                                  HorizontalAlignment="Left"/>
+                                <Popup x:Name="PART_Popup" 
+                                       AllowsTransparency="True" 
+                                       Focusable="False" 
+                                       IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
+                                       Placement="Bottom" 
+                                       PopupAnimation="Fade">
+                                    <Border Background="#252526" 
+                                            BorderBrush="#3F3F46" 
+                                            BorderThickness="1" 
+                                            CornerRadius="3" 
+                                            Padding="2" 
+                                            Margin="0,2,0,0">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.4" Color="Black"/>
+                                        </Border.Effect>
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#3E3E42"/>
+                            </Trigger>
+                            <Trigger Property="IsSubmenuOpen" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#3E3E42"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#666666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Menu Superior -->
+        <Menu DockPanel.Dock="Top" Background="#252526" Foreground="White" FontSize="14" Padding="5">
+            <MenuItem Header="Main" Command="{Binding NavigateToDashboardCommand}" />
+            <MenuItem Header="Tools">
+                <MenuItem Header="Liveries Manager" Command="{Binding NavigateToLiveryManagerCommand}" />
+                <Separator />
+                <MenuItem Header="Fuel Calculator" Command="{Binding NavigateToFuelCalculatorCommand}" />
+                <MenuItem Header="Calculadora de Performance" Command="{Binding NavigateToPerformanceCalculatorCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Área Central que altera dinamicamente de tela -->
+        <ContentControl Content="{Binding CurrentView}" Margin="10" />
+    </DockPanel>
+</Window>
