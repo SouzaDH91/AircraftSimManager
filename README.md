@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/github/v/release/SEU-USUARIO/SEU-REPOSITORIO?style=for-the-badge)](https://github.com/SouzaDH91/AircraftSimManager/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/SouzaDH91/AircraftSimManager?style=for-the-badge)](https://github.com/SouzaDH91/AircraftSimManager/releases/latest)
 
 
 # ✈️ Aircraft Sim Manager
