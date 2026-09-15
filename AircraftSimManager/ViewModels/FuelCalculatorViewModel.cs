@@ -96,6 +96,36 @@ namespace AircraftSimManager.ViewModels
 			}
 		}
 
+		public double LeftTankFuel
+		{
+			get => _leftTankFuel;
+			set { _leftTankFuel = value; OnPropertyChanged(nameof(LeftTankFuel)); OnPropertyChanged(nameof(LeftTankFuelDisplay)); }
+		}
+
+		public double CenterTankFuel
+		{
+			get => _centerTankFuel;
+			set { _centerTankFuel = value; OnPropertyChanged(nameof(CenterTankFuel)); OnPropertyChanged(nameof(CenterTankFuelDisplay)); }
+		}
+
+		public double RightTankFuel
+		{
+			get => _rightTankFuel;
+			set { _rightTankFuel = value; OnPropertyChanged(nameof(RightTankFuel)); OnPropertyChanged(nameof(RightTankFuelDisplay)); }
+		}
+
+		private double _totalBlockFuel;
+		public double TotalBlockFuel
+		{
+			get => _totalBlockFuelKg;
+			set
+			{
+				_totalBlockFuelKg = value;
+				OnPropertyChanged(nameof(TotalBlockFuel));
+				OnPropertyChanged(nameof(TotalBlockFuelDisplay));
+			}
+		}
+
 		public bool IsLbsSelected
 		{
 			get => _isLbsSelected;
@@ -226,42 +256,53 @@ namespace AircraftSimManager.ViewModels
 			}
 		}
 
-		private void RecalculateAll()
+		private void CalculateFuelDistribution(double requiredFuelKg)
 		{
 			if (SelectedAircraft == null) return;
 
-			double averageSpeedKnots = 430;
-			double flightTimeHours = FlightDistanceNM > 0 ? FlightDistanceNM / averageSpeedKnots : 0;
+			double maxWingCapacity = SelectedAircraft.WingTanksCapacityKg;
+			double maxSingleWingCapacity = maxWingCapacity / 2;
 
-			// Utiliza o CruiseBurnPerHourKg da aeronave selecionada
-			double tripFuel = (flightTimeHours * SelectedAircraft.CruiseBurnPerHourKg) + 350;
-			double contingencyFuel = tripFuel * 0.05;
-			double alternateFuel = (80.0 / averageSpeedKnots) * SelectedAircraft.CruiseBurnPerHourKg;
-			double holdingFuel = SelectedAircraft.CruiseBurnPerHourKg * 0.5;
-
-			_totalBlockFuelKg = Math.Ceiling(tripFuel + contingencyFuel + alternateFuel + holdingFuel);
-
-			// Distribuição de combustível usando o limite das asas da aeronave atual
-			double maxWing = SelectedAircraft.TotalFuelCapacityKg;
-			double halfFuel = _totalBlockFuelKg / 2;
-
-			if (halfFuel <= maxWing)
+			if (requiredFuelKg <= maxWingCapacity)
 			{
-				_leftTankFuel = halfFuel;
-				_rightTankFuel = halfFuel;
-				_centerTankFuel = 0;
+				// Se o combustível necessário cabe nas asas: divide 50/50 e zera o centro
+				LeftTankFuel = requiredFuelKg / 2;
+				RightTankFuel = requiredFuelKg / 2;
+				CenterTankFuel = 0;
 			}
 			else
 			{
-				_leftTankFuel = maxWing;
-				_rightTankFuel = maxWing;
-				_centerTankFuel = _totalBlockFuelKg - (maxWing * 2);
+				// Se exceder a capacidade das asas: enche 100% das asas e joga o excesso no centro
+				LeftTankFuel = maxSingleWingCapacity;
+				RightTankFuel = maxSingleWingCapacity;
+				CenterTankFuel = requiredFuelKg - maxWingCapacity;
+			}
+		}
+
+		private void RecalculateAll()
+		{
+			if (SelectedAircraft == null || FlightDistanceNM <= 0) return;
+
+			// 1. Calcula o tempo estimado de voo em horas
+			double estimatedHours = FlightDistanceNM / 400.0; // Assume vel. média ~400 kts em cruzeiro
+
+			// 2. Calcula o combustível do voo + reservas (ex: 45 min de reserva)
+			double tripFuel = estimatedHours * SelectedAircraft.CruiseBurnPerHourKg;
+			double reserveFuel = SelectedAircraft.CruiseBurnPerHourKg * 0.75; // 45min = 0.75h
+			double extraWeightFuel = (PassengerCount * 84 + CargoWeightKg) * 0.03; // Peso extra consome +3% de combustível
+
+			double totalRequiredKg = tripFuel + reserveFuel + extraWeightFuel;
+
+			// Trava para não ultrapassar a capacidade total da aeronave
+			if (totalRequiredKg > SelectedAircraft.TotalFuelCapacityKg)
+			{
+				totalRequiredKg = SelectedAircraft.TotalFuelCapacityKg;
 			}
 
-			OnPropertyChanged(nameof(TotalBlockFuelDisplay));
-			OnPropertyChanged(nameof(LeftTankFuelDisplay));
-			OnPropertyChanged(nameof(CenterTankFuelDisplay));
-			OnPropertyChanged(nameof(RightTankFuelDisplay));
+			TotalBlockFuel = totalRequiredKg;
+
+			// 3. CHAMA O MÉTODO DE DISTRIBUIÇÃO NOS TANQUES
+			CalculateFuelDistribution(totalRequiredKg);
 		}
 
 		private void ExecuteSaveFlight(object obj)
