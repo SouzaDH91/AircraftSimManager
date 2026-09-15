@@ -8,6 +8,7 @@ namespace AircraftSimManager.ViewModels
 	{
 		private readonly DashboardViewModel _dashboardViewModel = new();
 		private readonly LiveryManagerViewModel _liveryManagerViewModel = new();
+		private readonly FuelCalculatorViewModel _fuelCalculatorViewModel = new();
 
 		[ObservableProperty]
 		private object? currentView;
@@ -33,7 +34,7 @@ namespace AircraftSimManager.ViewModels
 		[RelayCommand]
 		private void NavigateToFuelCalculator()
 		{
-			CurrentView = new IncomingViewModel("Fuel Calculator");
+			CurrentView = _fuelCalculatorViewModel;
 		}
 
 		[RelayCommand]

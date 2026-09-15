@@ -1,0 +1,367 @@
+﻿<UserControl x:Class="AircraftSimManager.Views.FuelCalculatorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1000">
+
+    <UserControl.Resources>
+        <!-- Estilo dos Itens da Lista Suspensa (Dropdown List) -->
+        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#007ACC"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#3F3F46"/>
+                                <Setter Property="Foreground" Value="#4EC9B0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo do ComboBox (Caixa Selecionadora) -->
+        <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Grid.ColumnSpan="2"
+                                          Focusable="False"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="templateRoot" Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4">
+                                            <Border x:Name="splitBorder" Width="30" HorizontalAlignment="Right" Background="Transparent">
+                                                <Path x:Name="arrow" Data="F1 M 0,0 L 4,4 L 8,0 Z" Fill="#888888" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="templateRoot" Property="BorderBrush" Value="#007ACC"/>
+                                                <Setter TargetName="arrow" Property="Fill" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="contentTemplate"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              IsHitTestVisible="False"/>
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   Grid.ColumnSpan="2"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Margin="1"
+                                   PopupAnimation="Slide"
+                                   Placement="Bottom">
+                                <Border x:Name="dropDownBorder"
+                                        Background="#1E1E1E"
+                                        BorderBrush="#007ACC"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        MinWidth="{Binding ActualWidth, ElementName=MainGrid}">
+                                    <ScrollViewer x:Name="DropDownScrollViewer">
+                                        <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
+                                            <Canvas x:Name="canvas" HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
+                                                <Rectangle x:Name="opaqueRect" Fill="#1E1E1E" Height="{Binding ActualHeight, ElementName=dropDownBorder}" Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
+                                            </Canvas>
+                                            <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="180"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabeçalho + Switch KG/LBS -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="KG" Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ToggleButton IsChecked="{Binding IsLbsSelected}" Width="45" Height="22" Cursor="Hand"/>
+                <TextBlock Text="LBS" Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="Calculadora de Combustível (Fuel Planner)" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="Cálculo automático de distância e distribuição nos tanques da aeronave." FontSize="13" Foreground="#888888"/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Seção Principal -->
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Painel Inputs -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+
+                    <!-- Modelo da Aeronave com Estilo Escuro Aplicado -->
+                    <Border Background="#252526" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="✈️ Modelo da Aeronave" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
+                            <ComboBox Style="{StaticResource DarkComboBoxStyle}"
+                                      ItemsSource="{Binding AvailableAircraft}"
+                                      SelectedItem="{Binding SelectedAircraft}"
+                                      DisplayMemberPath="Name"
+                                      Cursor="Hand"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Rota do Voo -->
+                    <Border Background="#252526" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="🌐 Rota do Voo (ICAO)" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,10"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Origem:" Foreground="White" FontSize="11"/>
+                                    <TextBox Text="{Binding OriginIcao, UpdateSourceTrigger=PropertyChanged}" MaxLength="4" CharacterCasing="Upper" Background="#1E1E1E" Foreground="White" Padding="5" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Destino:" Foreground="White" FontSize="11"/>
+                                    <TextBox Text="{Binding DestinationIcao, UpdateSourceTrigger=PropertyChanged}" MaxLength="4" CharacterCasing="Upper" Background="#1E1E1E" Foreground="White" Padding="5" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Alternativo:" Foreground="White" FontSize="11"/>
+                                    <TextBox Text="{Binding AlternateIcao, UpdateSourceTrigger=PropertyChanged}" MaxLength="4" CharacterCasing="Upper" Background="#1E1E1E" Foreground="White" Padding="5" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Distância Calculada (NM):" Foreground="White" FontSize="11" Margin="0,5,0,3"/>
+                            <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <TextBlock Text="{Binding FlightDistanceNM, StringFormat='{}{0:N0} NM'}" Foreground="#4EC9B0" FontWeight="Bold" FontSize="13"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Carga & Consumo -->
+                    <Border Background="#252526" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="👥 Carga &amp; Consumo" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,10"/>
+                            <TextBlock Text="Passageiros (PAX):" Foreground="White" FontSize="11"/>
+                            <TextBox Text="{Binding PassengerCount, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="White" Padding="5" Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Carga no Porão (Cargo):" Foreground="White" FontSize="11"/>
+                            <TextBox Text="{Binding CargoWeightKg, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="White" Padding="5"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Command="{Binding SaveFlightCommand}" Content="💾 Salvar Planejamento" Background="#007ACC" Foreground="White" FontWeight="Bold" Padding="10" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Painel Ilustração da Aeronave -->
+            <Border Grid.Column="2" Background="#252526" CornerRadius="8" Padding="15">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0">
+                        <TextBlock Text="{Binding TotalBlockFuelDisplay, StringFormat='TOTAL: {0:N0}'}" Foreground="#4EC9B0" FontSize="18" FontWeight="Bold" DockPanel.Dock="Right"/>
+                        <TextBlock Text="{Binding UnitLabel, StringFormat=' ({0})'}" Foreground="#4EC9B0" FontSize="18" FontWeight="Bold" DockPanel.Dock="Right"/>
+                        <TextBlock Text="⛽ Distribuição nos Tanques" FontSize="16" FontWeight="Bold" Foreground="#007ACC"/>
+                    </DockPanel>
+
+                    <Viewbox Grid.Row="1" Margin="10">
+                        <Canvas Width="400" Height="280">
+                            <Path Data="M 200 15 C 208 15 218 50 218 120 L 370 190 L 370 210 L 218 180 L 212 260 L 240 275 L 240 285 L 200 275 L 160 285 L 160 275 L 188 260 L 182 180 L 30 210 L 30 190 L 182 120 C 182 50 192 15 200 15 Z"
+                                  Fill="#1E1E1E" Stroke="#3F3F46" StrokeThickness="3"/>
+
+                            <Border Canvas.Left="186" Canvas.Top="55" Width="28" Height="90" Background="#141414" CornerRadius="12" BorderBrush="#333333" BorderThickness="1">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="💺 PAX" Foreground="#888888" FontSize="7" HorizontalAlignment="Center" Margin="0,2,0,2"/>
+                                    <Border Width="20" Height="6" Background="#333333" CornerRadius="3" Margin="0,1">
+                                        <ProgressBar Value="{Binding PaxOccupancyPercentage, Mode=OneWay}" Height="6" Foreground="#4EC9B0" Background="Transparent" BorderThickness="0"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding PassengerCount, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding MaxPassengers, StringFormat='{}/ {0}'}" Foreground="#666666" FontSize="7" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Canvas.Left="186" Canvas.Top="150" Width="28" Height="65" Background="#141414" CornerRadius="4" BorderBrush="#333333" BorderThickness="1">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="📦 CARGO" Foreground="#888888" FontSize="7" HorizontalAlignment="Center" Margin="0,2,0,2"/>
+                                    <Border Width="20" Height="6" Background="#333333" CornerRadius="3" Margin="0,1">
+                                        <ProgressBar Value="{Binding CargoOccupancyPercentage, Mode=OneWay}" Height="6" Foreground="#FFD700" Background="Transparent" BorderThickness="0"/>
+                                    </Border>
+                                    <!-- Exibe a carga convertida conforme a unidade selecionada -->
+                                    <TextBlock Text="{Binding CargoWeightDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <!-- Exibe dinamicamente 'KG' ou 'LBS' -->
+                                    <TextBlock Text="{Binding UnitLabel}" Foreground="#666666" FontSize="6" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Canvas.Left="55" Canvas.Top="145" Background="#2D2D30" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="5" Padding="5">
+                                <StackPanel>
+                                    <TextBlock Text="LEFT TANK" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding LeftTankFuelDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding UnitLabel}" Foreground="#007ACC" FontSize="9" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Canvas.Left="150" Canvas.Top="120" Width="100" Background="#2D2D30" BorderBrush="#FFD700" BorderThickness="2" CornerRadius="5" Padding="5" Panel.ZIndex="10">
+                                <StackPanel>
+                                    <TextBlock Text="CENTER TANK" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding CenterTankFuelDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding UnitLabel}" Foreground="#FFD700" FontSize="9" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Canvas.Left="265" Canvas.Top="145" Background="#2D2D30" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="5" Padding="5">
+                                <StackPanel>
+                                    <TextBlock Text="RIGHT TANK" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding RightTankFuelDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding UnitLabel}" Foreground="#007ACC" FontSize="9" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Canvas>
+                    </Viewbox>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Histórico de Voos -->
+        <Border Grid.Row="2" Background="#252526" CornerRadius="8" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="📜 Histórico de Voos Salvos" FontSize="14" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
+
+                <DataGrid Grid.Row="1" 
+                          ItemsSource="{Binding FlightHistory}" 
+                          SelectedItem="{Binding SelectedFlightHistoryItem}"
+                          AutoGenerateColumns="False" 
+                          IsReadOnly="True" 
+                          Background="#1E1E1E" 
+                          RowBackground="#252526" 
+                          AlternatingRowBackground="#1E1E1E" 
+                          Foreground="White" 
+                          GridLinesVisibility="Horizontal" 
+                          HorizontalGridLinesBrush="#3F3F46" 
+                          BorderThickness="0">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#2D2D30"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Height" Value="30"/>
+                            <Setter Property="Padding" Value="8,0"/>
+                            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                            <Setter Property="BorderBrush" Value="#3F3F46"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGrid.Resources>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Aircraft" Binding="{Binding AircraftName}" Width="130"/>
+                        <DataGridTextColumn Header="Data" Binding="{Binding DateCalculated}" Width="130"/>
+                        <DataGridTextColumn Header="Origem" Binding="{Binding Origin}" Width="70"/>
+                        <DataGridTextColumn Header="Destino" Binding="{Binding Destination}" Width="70"/>
+                        <DataGridTextColumn Header="Alternativo" Binding="{Binding Alternate}" Width="90"/>
+                        <DataGridTextColumn Header="Distância" Binding="{Binding DistanceNM, StringFormat='{}{0:N0} NM'}" Width="90"/>
+                        <DataGridTextColumn Header="Passageiros" Binding="{Binding Passengers}" Width="90"/>
+                        <DataGridTextColumn Header="Combustível Total" Binding="{Binding TotalFuelKg, StringFormat='{}{0:N0} kg'}" Width="*"/>
+
+                        <!-- Coluna de Ações com Botão Deletar -->
+                        <DataGridTemplateColumn Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="🗑️" 
+                                            Command="{Binding DataContext.DeleteFlightCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                            CommandParameter="{Binding}" 
+                                            Background="Transparent" 
+                                            Foreground="#FF6B6B" 
+                                            BorderThickness="0" 
+                                            Cursor="Hand" 
+                                            ToolTip="Excluir voo do histórico"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Banner PRO -->
+        <Border Grid.Row="3" Background="#2D2D30" CornerRadius="8" Padding="10" Margin="0,10,0,0">
+            <DockPanel>
+                <TextBlock Text="💎 Recursos PRO:" FontWeight="Bold" Foreground="#FFD700"/>
+                <TextBlock Text=" Sincronize estes tanques diretamente com a aeronave no simulador via SimConnect!" Foreground="#CCCCCC" Margin="5,0,0,0"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>
