@@ -254,8 +254,10 @@
                                     <Border Width="20" Height="6" Background="#333333" CornerRadius="3" Margin="0,1">
                                         <ProgressBar Value="{Binding CargoOccupancyPercentage, Mode=OneWay}" Height="6" Foreground="#FFD700" Background="Transparent" BorderThickness="0"/>
                                     </Border>
-                                    <TextBlock Text="{Binding CargoWeightKg, StringFormat='{}{0:N0}kg'}" Foreground="White" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding MaxCargoKg, StringFormat='{}Max {0}kg'}" Foreground="#666666" FontSize="6" HorizontalAlignment="Center"/>
+                                    <!-- Exibe a carga convertida conforme a unidade selecionada -->
+                                    <TextBlock Text="{Binding CargoWeightDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <!-- Exibe dinamicamente 'KG' ou 'LBS' -->
+                                    <TextBlock Text="{Binding UnitLabel}" Foreground="#666666" FontSize="6" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
@@ -298,9 +300,18 @@
 
                 <TextBlock Text="📜 Histórico de Voos Salvos" FontSize="14" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding FlightHistory}" AutoGenerateColumns="False" IsReadOnly="True" 
-                          Background="#1E1E1E" RowBackground="#252526" AlternatingRowBackground="#1E1E1E" 
-                          Foreground="White" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#3F3F46" BorderThickness="0">
+                <DataGrid Grid.Row="1" 
+                          ItemsSource="{Binding FlightHistory}" 
+                          SelectedItem="{Binding SelectedFlightHistoryItem}"
+                          AutoGenerateColumns="False" 
+                          IsReadOnly="True" 
+                          Background="#1E1E1E" 
+                          RowBackground="#252526" 
+                          AlternatingRowBackground="#1E1E1E" 
+                          Foreground="White" 
+                          GridLinesVisibility="Horizontal" 
+                          HorizontalGridLinesBrush="#3F3F46" 
+                          BorderThickness="0">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#2D2D30"/>
@@ -316,6 +327,7 @@
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
+                        <DataGridTextColumn Header="Aircraft" Binding="{Binding AircraftName}" Width="130"/>
                         <DataGridTextColumn Header="Data" Binding="{Binding DateCalculated}" Width="130"/>
                         <DataGridTextColumn Header="Origem" Binding="{Binding Origin}" Width="70"/>
                         <DataGridTextColumn Header="Destino" Binding="{Binding Destination}" Width="70"/>
@@ -323,6 +335,22 @@
                         <DataGridTextColumn Header="Distância" Binding="{Binding DistanceNM, StringFormat='{}{0:N0} NM'}" Width="90"/>
                         <DataGridTextColumn Header="Passageiros" Binding="{Binding Passengers}" Width="90"/>
                         <DataGridTextColumn Header="Combustível Total" Binding="{Binding TotalFuelKg, StringFormat='{}{0:N0} kg'}" Width="*"/>
+
+                        <!-- Coluna de Ações com Botão Deletar -->
+                        <DataGridTemplateColumn Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="🗑️" 
+                                            Command="{Binding DataContext.DeleteFlightCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                            CommandParameter="{Binding}" 
+                                            Background="Transparent" 
+                                            Foreground="#FF6B6B" 
+                                            BorderThickness="0" 
+                                            Cursor="Hand" 
+                                            ToolTip="Excluir voo do histórico"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

@@ -28,7 +28,6 @@ namespace AircraftSimManager.ViewModels
 		private double _flightDistanceNM;
 		private double _passengerCount = 132;
 		private double _cargoWeightKg = 1200;
-		private double _cruiseBurnPerHourKg = 2400;
 
 		private bool _isLbsSelected;
 		private double _totalBlockFuelKg;
@@ -36,16 +35,13 @@ namespace AircraftSimManager.ViewModels
 		private double _centerTankFuel;
 		private double _rightTankFuel;
 
-		public double MaxPassengers => SelectedAircraft?.MaxPassengers ?? 180;
-		public double MaxCargoKg => SelectedAircraft?.MaxCargoKg ?? 4500;
-
-		public double PaxOccupancyPercentage => MaxPassengers > 0 ? Math.Min(100, (PassengerCount / MaxPassengers) * 100) : 0;
-		public double CargoOccupancyPercentage => MaxCargoKg > 0 ? Math.Min(100, (CargoWeightKg / MaxCargoKg) * 100) : 0;
+		private FlightRecord _selectedFlightRecord;
 
 		public ObservableCollection<FlightRecord> FlightHistory { get; set; } = new();
 		public ObservableCollection<AircraftModel> AvailableAircraft { get; set; }
 
 		public ICommand SaveFlightCommand { get; }
+		public ICommand DeleteFlightCommand { get; }
 
 		#region Properties (Getters/Setters)
 		public string OriginIcao
@@ -77,7 +73,7 @@ namespace AircraftSimManager.ViewModels
 			get => _passengerCount;
 			set
 			{
-				_passengerCount = Math.Min(value, MaxPassengers); // Trava no limite
+				_passengerCount = Math.Min(value, MaxPassengers);
 				OnPropertyChanged();
 				OnPropertyChanged(nameof(PaxOccupancyPercentage));
 				RecalculateAll();
@@ -89,10 +85,50 @@ namespace AircraftSimManager.ViewModels
 			get => _cargoWeightKg;
 			set
 			{
-				_cargoWeightKg = Math.Min(value, MaxCargoKg); // Trava no limite
+				_cargoWeightKg = Math.Min(value, MaxCargoKg);
 				OnPropertyChanged();
+				OnPropertyChanged(nameof(CargoWeightDisplay));
 				OnPropertyChanged(nameof(CargoOccupancyPercentage));
 				RecalculateAll();
+			}
+		}
+
+		public AircraftModel SelectedAircraft
+		{
+			get => _selectedAircraft;
+			set
+			{
+				if (_selectedAircraft != value && value != null)
+				{
+					_selectedAircraft = value;
+					OnPropertyChanged();
+
+					if (PassengerCount > MaxPassengers) PassengerCount = MaxPassengers;
+					if (CargoWeightKg > MaxCargoKg) CargoWeightKg = MaxCargoKg;
+
+					OnPropertyChanged(nameof(MaxPassengers));
+					OnPropertyChanged(nameof(MaxCargoKg));
+					OnPropertyChanged(nameof(MaxCargoDisplay));
+					OnPropertyChanged(nameof(PaxOccupancyPercentage));
+					OnPropertyChanged(nameof(CargoOccupancyPercentage));
+
+					RecalculateAll();
+				}
+			}
+		}
+
+		// Carrega os dados do voo selecionado na UI
+		public FlightRecord SelectedFlightRecord
+		{
+			get => _selectedFlightRecord;
+			set
+			{
+				_selectedFlightRecord = value;
+				OnPropertyChanged();
+				if (_selectedFlightRecord != null)
+				{
+					LoadSelectedFlightRecord(_selectedFlightRecord);
+				}
 			}
 		}
 
@@ -114,7 +150,6 @@ namespace AircraftSimManager.ViewModels
 			set { _rightTankFuel = value; OnPropertyChanged(nameof(RightTankFuel)); OnPropertyChanged(nameof(RightTankFuelDisplay)); }
 		}
 
-		private double _totalBlockFuel;
 		public double TotalBlockFuel
 		{
 			get => _totalBlockFuelKg;
@@ -136,19 +171,35 @@ namespace AircraftSimManager.ViewModels
 					_isLbsSelected = value;
 					_configService.WeightUnit = value ? "LBS" : "KG";
 					_configService.SaveSettings();
+
 					OnPropertyChanged();
 					OnPropertyChanged(nameof(UnitLabel));
-					RecalculateAll();
+					OnPropertyChanged(nameof(TotalBlockFuelDisplay));
+					OnPropertyChanged(nameof(LeftTankFuelDisplay));
+					OnPropertyChanged(nameof(CenterTankFuelDisplay));
+					OnPropertyChanged(nameof(RightTankFuelDisplay));
+					OnPropertyChanged(nameof(CargoWeightDisplay));
+					OnPropertyChanged(nameof(MaxCargoDisplay));
 				}
 			}
 		}
 
+		// Conversões e rótulos dinâmicos (KG / LBS)
 		public string UnitLabel => IsLbsSelected ? "lbs" : "kg";
+
+		public double CargoWeightDisplay => IsLbsSelected ? _cargoWeightKg * KgToLbs : _cargoWeightKg;
+		public double MaxCargoDisplay => IsLbsSelected ? MaxCargoKg * KgToLbs : MaxCargoKg;
 
 		public double TotalBlockFuelDisplay => IsLbsSelected ? _totalBlockFuelKg * KgToLbs : _totalBlockFuelKg;
 		public double LeftTankFuelDisplay => IsLbsSelected ? _leftTankFuel * KgToLbs : _leftTankFuel;
 		public double CenterTankFuelDisplay => IsLbsSelected ? _centerTankFuel * KgToLbs : _centerTankFuel;
 		public double RightTankFuelDisplay => IsLbsSelected ? _rightTankFuel * KgToLbs : _rightTankFuel;
+
+		public double MaxPassengers => SelectedAircraft?.MaxPassengers ?? 180;
+		public double MaxCargoKg => SelectedAircraft?.MaxCargoKg ?? 4500;
+
+		public double PaxOccupancyPercentage => MaxPassengers > 0 ? Math.Min(100, (PassengerCount / MaxPassengers) * 100) : 0;
+		public double CargoOccupancyPercentage => MaxCargoKg > 0 ? Math.Min(100, (CargoWeightKg / MaxCargoKg) * 100) : 0;
 		#endregion
 
 		public FuelCalculatorViewModel()
@@ -157,88 +208,23 @@ namespace AircraftSimManager.ViewModels
 			_airportService = new AirportService(_dbService);
 			_configService = new ConfigService();
 
-			// Popula lista de aeronaves disponíveis
 			AvailableAircraft = new ObservableCollection<AircraftModel>
-			{
-				new AircraftModel
-				{
-					Name = "Boeing 737-700",
-					MaxPassengers = 149,
-					MaxCargoKg = 4000,
-					CruiseBurnPerHourKg = 2200,
-					WingTanksCapacityKg = 7800,   // ~3.900 kg por asa
-					CenterTankCapacityKg = 13000
-				},
-				new AircraftModel
-				{
-					Name = "Boeing 737-800",
-					MaxPassengers = 180,
-					MaxCargoKg = 4500,
-					CruiseBurnPerHourKg = 2400,
-					WingTanksCapacityKg = 7800,   // ~3.900 kg por asa
-					CenterTankCapacityKg = 13000
-				},
-				new AircraftModel
-				{
-					Name = "Airbus A320neo",
-					MaxPassengers = 174,
-					MaxCargoKg = 4000,
-					CruiseBurnPerHourKg = 2000,
-					WingTanksCapacityKg = 12500,  // Tanques das asas + outer cells
-					CenterTankCapacityKg = 6500
-				},
-				new AircraftModel
-				{
-					Name = "ATR 72-600",
-					MaxPassengers = 72,
-					MaxCargoKg = 1500,
-					CruiseBurnPerHourKg = 650,
-					WingTanksCapacityKg = 5000,   // Todo o combustível fica nas asas
-					CenterTankCapacityKg = 0
-				},
-				new AircraftModel
-				{
-					Name = "Boeing 777-300ER",
-					MaxPassengers = 396,
-					MaxCargoKg = 20000,
-					CruiseBurnPerHourKg = 7500,
-					WingTanksCapacityKg = 58000,  // ~29.000 kg por asa
-					CenterTankCapacityKg = 87500
-				}
-			};
+		{
+			new AircraftModel { Name = "Boeing 737-700", MaxPassengers = 149, MaxCargoKg = 4000, CruiseBurnPerHourKg = 2200, WingTanksCapacityKg = 7800, CenterTankCapacityKg = 13000 },
+			new AircraftModel { Name = "Boeing 737-800", MaxPassengers = 180, MaxCargoKg = 4500, CruiseBurnPerHourKg = 2400, WingTanksCapacityKg = 7800, CenterTankCapacityKg = 13000 },
+			new AircraftModel { Name = "Airbus A320neo", MaxPassengers = 174, MaxCargoKg = 4000, CruiseBurnPerHourKg = 2000, WingTanksCapacityKg = 12500, CenterTankCapacityKg = 6500 },
+			new AircraftModel { Name = "ATR 72-600", MaxPassengers = 72, MaxCargoKg = 1500, CruiseBurnPerHourKg = 650, WingTanksCapacityKg = 5000, CenterTankCapacityKg = 0 },
+			new AircraftModel { Name = "Boeing 777-300ER", MaxPassengers = 396, MaxCargoKg = 20000, CruiseBurnPerHourKg = 7500, WingTanksCapacityKg = 58000, CenterTankCapacityKg = 87500 }
+		};
 
-			_selectedAircraft = AvailableAircraft[0]; // Padrão B737-800
+			_selectedAircraft = AvailableAircraft[0];
 
 			SaveFlightCommand = new RelayCommand(ExecuteSaveFlight);
+			DeleteFlightCommand = new RelayCommand(ExecuteDeleteFlight);
 
 			AutoCalculateDistance();
 			RecalculateAll();
 			LoadHistory();
-		}
-
-		public AircraftModel SelectedAircraft
-		{
-			get => _selectedAircraft;
-			set
-			{
-				if (_selectedAircraft != value && value != null)
-				{
-					_selectedAircraft = value;
-					OnPropertyChanged();
-
-					// Ajusta passageiros e carga se excederem o novo limite
-					if (PassengerCount > MaxPassengers) PassengerCount = MaxPassengers;
-					if (CargoWeightKg > MaxCargoKg) CargoWeightKg = MaxCargoKg;
-
-					// Notifica mudanças nos limites e porcentagens
-					OnPropertyChanged(nameof(MaxPassengers));
-					OnPropertyChanged(nameof(MaxCargoKg));
-					OnPropertyChanged(nameof(PaxOccupancyPercentage));
-					OnPropertyChanged(nameof(CargoOccupancyPercentage));
-
-					RecalculateAll();
-				}
-			}
 		}
 
 		private void AutoCalculateDistance()
@@ -265,14 +251,12 @@ namespace AircraftSimManager.ViewModels
 
 			if (requiredFuelKg <= maxWingCapacity)
 			{
-				// Se o combustível necessário cabe nas asas: divide 50/50 e zera o centro
 				LeftTankFuel = requiredFuelKg / 2;
 				RightTankFuel = requiredFuelKg / 2;
 				CenterTankFuel = 0;
 			}
 			else
 			{
-				// Se exceder a capacidade das asas: enche 100% das asas e joga o excesso no centro
 				LeftTankFuel = maxSingleWingCapacity;
 				RightTankFuel = maxSingleWingCapacity;
 				CenterTankFuel = requiredFuelKg - maxWingCapacity;
@@ -283,25 +267,19 @@ namespace AircraftSimManager.ViewModels
 		{
 			if (SelectedAircraft == null || FlightDistanceNM <= 0) return;
 
-			// 1. Calcula o tempo estimado de voo em horas
-			double estimatedHours = FlightDistanceNM / 400.0; // Assume vel. média ~400 kts em cruzeiro
-
-			// 2. Calcula o combustível do voo + reservas (ex: 45 min de reserva)
+			double estimatedHours = FlightDistanceNM / 400.0;
 			double tripFuel = estimatedHours * SelectedAircraft.CruiseBurnPerHourKg;
-			double reserveFuel = SelectedAircraft.CruiseBurnPerHourKg * 0.75; // 45min = 0.75h
-			double extraWeightFuel = (PassengerCount * 84 + CargoWeightKg) * 0.03; // Peso extra consome +3% de combustível
+			double reserveFuel = SelectedAircraft.CruiseBurnPerHourKg * 0.75;
+			double extraWeightFuel = (PassengerCount * 84 + CargoWeightKg) * 0.03;
 
 			double totalRequiredKg = tripFuel + reserveFuel + extraWeightFuel;
 
-			// Trava para não ultrapassar a capacidade total da aeronave
 			if (totalRequiredKg > SelectedAircraft.TotalFuelCapacityKg)
 			{
 				totalRequiredKg = SelectedAircraft.TotalFuelCapacityKg;
 			}
 
 			TotalBlockFuel = totalRequiredKg;
-
-			// 3. CHAMA O MÉTODO DE DISTRIBUIÇÃO NOS TANQUES
 			CalculateFuelDistribution(totalRequiredKg);
 		}
 
@@ -309,17 +287,44 @@ namespace AircraftSimManager.ViewModels
 		{
 			var record = new FlightRecord
 			{
+				AircraftName = SelectedAircraft?.Name,
 				Origin = OriginIcao,
 				Destination = DestinationIcao,
 				Alternate = AlternateIcao,
 				DistanceNM = FlightDistanceNM,
 				Passengers = PassengerCount,
 				CargoKg = CargoWeightKg,
-				TotalFuelKg = _totalBlockFuelKg
+				TotalFuelKg = TotalBlockFuel
 			};
 
 			_dbService.SaveFlight(record);
 			LoadHistory();
+		}
+
+		private void ExecuteDeleteFlight(object obj)
+		{
+			if (obj is FlightRecord record)
+			{
+				_dbService.DeleteFlight(record.Id);
+				LoadHistory();
+			}
+		}
+
+		private void LoadSelectedFlightRecord(FlightRecord record)
+		{
+			var aircraft = AvailableAircraft.FirstOrDefault(a => a.Name == record.AircraftName);
+			if (aircraft != null)
+			{
+				SelectedAircraft = aircraft;
+			}
+
+			OriginIcao = record.Origin;
+			DestinationIcao = record.Destination;
+			AlternateIcao = record.Alternate;
+			PassengerCount = record.Passengers;
+			CargoWeightKg = record.CargoKg;
+
+			RecalculateAll();
 		}
 
 		private void LoadHistory()

@@ -22,32 +22,43 @@ namespace AircraftSimManager.Data.Services
 			InitializeDatabase();
 		}
 
+		private SqliteConnection Connection(bool connectionAsync = false)
+		{
+			var connection = new SqliteConnection($"Data Source={_dbPath}");
+			if (!connectionAsync)
+			{
+				connection.Open();
+			}
+
+			return connection;
+		}
+
 		private void InitializeDatabase()
 		{
-			using var connection = new SqliteConnection($"Data Source={_dbPath}");
-			connection.Open();
+			using var connection = Connection();
 
-			// Tabela de Aeroportos Mundial (INDEX no ICAO otimiza buscas instantâneas)
+			// Tabela de Aeroportos Mundial
 			string createAirports = @"
-                CREATE TABLE IF NOT EXISTS airports (
-                    icao TEXT PRIMARY KEY,
-                    latitude REAL NOT NULL,
-                    longitude REAL NOT NULL
-                );";
+            CREATE TABLE IF NOT EXISTS airports (
+                icao TEXT PRIMARY KEY,
+                latitude REAL NOT NULL,
+                longitude REAL NOT NULL
+            );";
 
-			// Tabela de Histórico de Voos
+			// Tabela de Histórico de Voos (incluindo a coluna aircraft_name)
 			string createHistory = @"
-                CREATE TABLE IF NOT EXISTS flight_history (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    origin TEXT NOT NULL,
-                    destination TEXT NOT NULL,
-                    alternate TEXT,
-                    distance_nm REAL,
-                    passengers REAL,
-                    cargo_kg REAL,
-                    total_fuel_kg REAL,
-                    date_calculated TEXT
-                );";
+            CREATE TABLE IF NOT EXISTS flight_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                aircraft_name TEXT,
+                origin TEXT NOT NULL,
+                destination TEXT NOT NULL,
+                alternate TEXT,
+                distance_nm REAL,
+                passengers REAL,
+                cargo_kg REAL,
+                total_fuel_kg REAL,
+                date_calculated TEXT
+            );";
 
 			using var cmd1 = new SqliteCommand(createAirports, connection);
 			cmd1.ExecuteNonQuery();
@@ -55,7 +66,18 @@ namespace AircraftSimManager.Data.Services
 			using var cmd2 = new SqliteCommand(createHistory, connection);
 			cmd2.ExecuteNonQuery();
 
-			// Importa o CSV do OurAirports em background se a base estiver vazia
+			// Garante que a coluna aircraft_name exista se o banco já tiver sido criado anteriormente
+			try
+			{
+				string alterTable = "ALTER TABLE flight_history ADD COLUMN aircraft_name TEXT;";
+				using var cmdAlter = new SqliteCommand(alterTable, connection);
+				cmdAlter.ExecuteNonQuery();
+			}
+			catch
+			{
+				// Ignora o erro se a coluna já existir
+			}
+
 			Task.Run(async () => await SeedAirportsFromCsvAsync());
 		}
 
@@ -63,17 +85,15 @@ namespace AircraftSimManager.Data.Services
 		{
 			try
 			{
-				using var connection = new SqliteConnection($"Data Source={_dbPath}");
+				using var connection = Connection(true);
 				await connection.OpenAsync();
 
-				// Verifica se já existem aeroportos cadastrados
 				string countQuery = "SELECT COUNT(*) FROM airports;";
 				using var countCmd = new SqliteCommand(countQuery, connection);
 				long count = (long)(await countCmd.ExecuteScalarAsync() ?? 0);
 
-				if (count > 0) return; // Se já foi populado, ignora o download
+				if (count > 0) return;
 
-				// Download do arquivo CSV
 				var response = await _httpClient.GetAsync(OurAirportsCsvUrl);
 				if (!response.IsSuccessStatusCode) return;
 
@@ -83,7 +103,6 @@ namespace AircraftSimManager.Data.Services
 				string? headerLine = await reader.ReadLineAsync();
 				if (headerLine == null) return;
 
-				// Identifica o índice das colunas necessárias no cabeçalho do CSV
 				var headers = parseCsvLine(headerLine);
 				int identIdx = headers.IndexOf("ident");
 				int latIdx = headers.IndexOf("latitude_deg");
@@ -91,7 +110,6 @@ namespace AircraftSimManager.Data.Services
 
 				if (identIdx == -1 || latIdx == -1 || lonIdx == -1) return;
 
-				// Inicia transação SQLite em lote (essencial para altíssima performance)
 				using var transaction = connection.BeginTransaction();
 				string insertQuery = "INSERT OR IGNORE INTO airports (icao, latitude, longitude) VALUES (@icao, @lat, @lon);";
 
@@ -108,7 +126,6 @@ namespace AircraftSimManager.Data.Services
 					{
 						string icao = cols[identIdx].Trim().ToUpper();
 
-						// Garante que só salvaremos ICAOs válidos de 3 a 4 caracteres
 						if (icao.Length >= 3 && icao.Length <= 4 &&
 							double.TryParse(cols[latIdx], NumberStyles.Any, CultureInfo.InvariantCulture, out double lat) &&
 							double.TryParse(cols[lonIdx], NumberStyles.Any, CultureInfo.InvariantCulture, out double lon))
@@ -125,11 +142,9 @@ namespace AircraftSimManager.Data.Services
 			}
 			catch (Exception)
 			{
-				// Trata falha no download/importação sem travar a aplicação
 			}
 		}
 
-		// Parser simples de linha CSV respeitando aspas
 		private List<string> parseCsvLine(string line)
 		{
 			var result = new List<string>();
@@ -160,8 +175,7 @@ namespace AircraftSimManager.Data.Services
 		{
 			if (string.IsNullOrWhiteSpace(icao)) return null;
 
-			using var connection = new SqliteConnection($"Data Source={_dbPath}");
-			connection.Open();
+			using var connection = Connection();
 
 			string query = "SELECT icao, latitude, longitude FROM airports WHERE icao = @icao LIMIT 1;";
 			using var cmd = new SqliteCommand(query, connection);
@@ -182,17 +196,17 @@ namespace AircraftSimManager.Data.Services
 
 		public void SaveFlight(FlightRecord flight)
 		{
-			using var connection = new SqliteConnection($"Data Source={_dbPath}");
-			connection.Open();
+			using var connection = Connection();
 
 			string insertQuery = @"
-                INSERT INTO flight_history 
-                (origin, destination, alternate, distance_nm, passengers, cargo_kg, total_fuel_kg, date_calculated)
-                VALUES (@origin, @destination, @alternate, @distance, @pax, @cargo, @fuel, @date);";
+            INSERT INTO flight_history 
+            (aircraft_name, origin, destination, alternate, distance_nm, passengers, cargo_kg, total_fuel_kg, date_calculated)
+            VALUES (@aircraft, @origin, @destination, @alternate, @distance, @pax, @cargo, @fuel, @date);";
 
 			using var cmd = new SqliteCommand(insertQuery, connection);
-			cmd.Parameters.AddWithValue("@origin", flight.Origin);
-			cmd.Parameters.AddWithValue("@destination", flight.Destination);
+			cmd.Parameters.AddWithValue("@aircraft", flight.AircraftName ?? string.Empty);
+			cmd.Parameters.AddWithValue("@origin", flight.Origin ?? string.Empty);
+			cmd.Parameters.AddWithValue("@destination", flight.Destination ?? string.Empty);
 			cmd.Parameters.AddWithValue("@alternate", flight.Alternate ?? string.Empty);
 			cmd.Parameters.AddWithValue("@distance", flight.DistanceNM);
 			cmd.Parameters.AddWithValue("@pax", flight.Passengers);
@@ -206,10 +220,9 @@ namespace AircraftSimManager.Data.Services
 		public List<FlightRecord> GetFlightHistory()
 		{
 			var history = new List<FlightRecord>();
-			using var connection = new SqliteConnection($"Data Source={_dbPath}");
-			connection.Open();
+			using var connection = Connection();
 
-			string query = "SELECT id, origin, destination, alternate, distance_nm, passengers, cargo_kg, total_fuel_kg, date_calculated FROM flight_history ORDER BY id DESC LIMIT 20;";
+			string query = "SELECT id, aircraft_name, origin, destination, alternate, distance_nm, passengers, cargo_kg, total_fuel_kg, date_calculated FROM flight_history ORDER BY id DESC LIMIT 20;";
 			using var cmd = new SqliteCommand(query, connection);
 			using var reader = cmd.ExecuteReader();
 
@@ -218,18 +231,30 @@ namespace AircraftSimManager.Data.Services
 				history.Add(new FlightRecord
 				{
 					Id = reader.GetInt32(0),
-					Origin = reader.GetString(1),
-					Destination = reader.GetString(2),
-					Alternate = reader.IsDBNull(3) ? "" : reader.GetString(3),
-					DistanceNM = reader.GetDouble(4),
-					Passengers = reader.GetDouble(5),
-					CargoKg = reader.GetDouble(6),
-					TotalFuelKg = reader.GetDouble(7),
-					DateCalculated = reader.GetString(8)
+					AircraftName = reader.IsDBNull(1) ? "" : reader.GetString(1),
+					Origin = reader.IsDBNull(2) ? "" : reader.GetString(2),
+					Destination = reader.IsDBNull(3) ? "" : reader.GetString(3),
+					Alternate = reader.IsDBNull(4) ? "" : reader.GetString(4),
+					DistanceNM = reader.GetDouble(5),
+					Passengers = reader.GetDouble(6),
+					CargoKg = reader.GetDouble(7),
+					TotalFuelKg = reader.GetDouble(8),
+					DateCalculated = reader.IsDBNull(9) ? "" : reader.GetString(9)
 				});
 			}
 
 			return history;
+		}
+
+		// Método de exclusão ajustado para usar SqliteCommand nativo
+		public void DeleteFlight(int id)
+		{
+			using var connection = Connection();
+			string deleteQuery = "DELETE FROM flight_history WHERE id = @id;";
+
+			using var cmd = new SqliteCommand(deleteQuery, connection);
+			cmd.Parameters.AddWithValue("@id", id);
+			cmd.ExecuteNonQuery();
 		}
 	}
 }
