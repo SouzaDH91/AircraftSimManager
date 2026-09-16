@@ -5,29 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AircraftSimManager.ViewModels"
         xmlns:views="clr-namespace:AircraftSimManager.Views"
+        xmlns:helpers="clr-namespace:AircraftSimManager.Helpers"
         mc:Ignorable="d"
         Title="Aircraft Sim Manager" Height="1000" Width="1200"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E">
 
     <Window.Resources>
-        <!-- Mapeamento automático da ViewModel para a View correspondente -->
+        <!-- DataTemplates de Navegação -->
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView />
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type vm:LiveryManagerViewModel}">
             <views:LiveryManagerView />
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type vm:IncomingViewModel}">
             <views:IncomingView />
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type vm:FuelCalculatorViewModel}">
             <views:FuelCalculatorView />
         </DataTemplate>
 
-        <!-- Estilo Dark para Separator dentro do Menu -->
+        <!-- Separador Dark -->
         <Style TargetType="{x:Type Separator}">
             <Setter Property="Background" Value="#3F3F46"/>
             <Setter Property="Margin" Value="4,3"/>
@@ -41,12 +39,12 @@
             </Setter>
         </Style>
 
-        <!-- Estilo Dark para MenuItems e Dropdowns -->
-        <Style TargetType="{x:Type MenuItem}">
+        <!-- 1. ESTILO PARA O MENU PRINCIPAL (TOPO) - Texto Centralizado, Sem coluna de checkmark -->
+        <Style x:Key="TopLevelMenuItemStyle" TargetType="{x:Type MenuItem}">
             <Setter Property="Background" Value="#252526"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Padding" Value="12,6"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type MenuItem}">
@@ -56,11 +54,12 @@
                                 BorderThickness="{TemplateBinding BorderThickness}" 
                                 Padding="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="True">
-                            <Grid>
+                            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <ContentPresenter ContentSource="Header" 
                                                   RecognizesAccessKey="True" 
                                                   VerticalAlignment="Center" 
-                                                  HorizontalAlignment="Left"/>
+                                                  HorizontalAlignment="Center"/>
+
                                 <Popup x:Name="PART_Popup" 
                                        AllowsTransparency="True" 
                                        Focusable="False" 
@@ -81,6 +80,7 @@
                                 </Popup>
                             </Grid>
                         </Border>
+
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="#3E3E42"/>
@@ -96,21 +96,103 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- 2. ESTILO PARA OS SUBMENUS - Alinhado à Esquerda com Espaço do Checkmark (✓) -->
+        <Style x:Key="SubMenuItemStyle" TargetType="{x:Type MenuItem}">
+            <Setter Property="Background" Value="#252526"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                        <Border x:Name="Border" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="22"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="CheckMark" 
+                                           Text="✓" 
+                                           Foreground="#007ACC" 
+                                           FontWeight="Bold" 
+                                           FontSize="13" 
+                                           Visibility="Collapsed" 
+                                           VerticalAlignment="Center" 
+                                           HorizontalAlignment="Center" 
+                                           Grid.Column="0"/>
+
+                                <ContentPresenter ContentSource="Header" 
+                                                  RecognizesAccessKey="True" 
+                                                  VerticalAlignment="Center" 
+                                                  HorizontalAlignment="Left" 
+                                                  Grid.Column="1"/>
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#3E3E42"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#666666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <DockPanel>
         <!-- Menu Superior -->
         <Menu DockPanel.Dock="Top" Background="#252526" Foreground="White" FontSize="14" Padding="5">
-            <MenuItem Header="Main" Command="{Binding NavigateToDashboardCommand}" />
-            <MenuItem Header="Tools">
-                <MenuItem Header="Liveries Manager" Command="{Binding NavigateToLiveryManagerCommand}" />
-                <Separator />
-                <MenuItem Header="Fuel Calculator" Command="{Binding NavigateToFuelCalculatorCommand}" />
-                <MenuItem Header="Calculadora de Performance" Command="{Binding NavigateToPerformanceCalculatorCommand}" />
+
+            <MenuItem Header="{helpers:Loc Home}" 
+                      Style="{StaticResource TopLevelMenuItemStyle}"
+                      Command="{Binding NavigateToDashboardCommand}" />
+
+            <MenuItem Header="{helpers:Loc Tools}"
+                      Style="{StaticResource TopLevelMenuItemStyle}">
+                <MenuItem Header="{helpers:Loc LiveriesManager}" 
+                          Style="{StaticResource SubMenuItemStyle}"
+                          Command="{Binding NavigateToLiveryManagerCommand}" />
+                <MenuItem Header="{helpers:Loc FuelCalculatorTitle}" 
+                          Style="{StaticResource SubMenuItemStyle}"
+                          Command="{Binding NavigateToFuelCalculatorCommand}" />
+                <MenuItem Header="{helpers:Loc PerformanceCalculator}" 
+                          Style="{StaticResource SubMenuItemStyle}"
+                          Command="{Binding NavigateToPerformanceCalculatorCommand}" />
+            </MenuItem>
+
+            <!-- Menu de Idiomas -->
+            <MenuItem Header="{helpers:Loc Language}" 
+                      Style="{StaticResource TopLevelMenuItemStyle}">
+                <MenuItem 
+                    Header="{helpers:Loc English}" 
+                    Style="{StaticResource SubMenuItemStyle}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsEnglish, Mode=OneWay}"
+                    Command="{Binding ChangeLanguageCommand}" CommandParameter="en-US"/>
+                <MenuItem 
+                    Header="{helpers:Loc PortugueseBr}" 
+                    Style="{StaticResource SubMenuItemStyle}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsPortuguese, Mode=OneWay}"
+                    Command="{Binding ChangeLanguageCommand}" CommandParameter="pt-BR"/>
             </MenuItem>
         </Menu>
 
-        <!-- Área Central que altera dinamicamente de tela -->
+        <!-- Área Central -->
         <ContentControl Content="{Binding CurrentView}" Margin="10" />
     </DockPanel>
 </Window>

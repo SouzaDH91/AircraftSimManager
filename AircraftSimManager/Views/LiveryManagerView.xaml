@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:helpers="clr-namespace:AircraftSimManager.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1100"
              AllowDrop="True" Drop="Window_Drop">
@@ -20,7 +21,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Simulador:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0" Foreground="White"/>
+            <TextBlock Text="{helpers:Loc SimulatorSelectText}" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0" Foreground="White"/>
             <ComboBox Grid.Column="1" ItemsSource="{Binding Simulators}" SelectedItem="{Binding SelectedSimulator}" DisplayMemberPath="Name" Padding="6,4"/>
         </Grid>
 
@@ -31,9 +32,9 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Caminho:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
+            <TextBlock Text="{helpers:Loc PathSim}" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
             <TextBox Grid.Column="1" Text="{Binding AirplanesPath, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,8,0" VerticalAlignment="Center" Padding="4"/>
-            <Button Grid.Column="2" Content="Atualizar" Command="{Binding LoadLiveriesCommand}" Padding="12,4"/>
+            <Button Grid.Column="2" Content="{helpers:Loc BtnUpdate}" Command="{Binding LoadLiveriesCommand}" Padding="12,4"/>
         </Grid>
 
         <!-- Corpo Principal -->
@@ -44,7 +45,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Lista de Aeronaves e Liveries -->
-            <GroupBox Header="Liveries Instaladas" Grid.Column="0" Margin="0,0,6,0" Foreground="White">
+            <GroupBox Header="{helpers:Loc TextInstalledLiveries}" Grid.Column="0" Margin="0,0,6,0" Foreground="White">
                 <TreeView ItemsSource="{Binding AircraftGroups}" x:Name="TvAircrafts" SelectedItemChanged="TvAircrafts_SelectedItemChanged">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Liveries}">
@@ -71,7 +72,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- 1. Pré-visualização da Livery -->
-                <GroupBox Header="Pré-visualização (Preview)" Grid.Row="0" Margin="0,0,0,8" Foreground="White">
+                <GroupBox Header="{helpers:Loc PreviewImage}" Grid.Row="0" Margin="0,0,0,8" Foreground="White">
                     <Border Height="150" Background="#0F172A" CornerRadius="4" ClipToBounds="True">
                         <Grid>
                             <!-- Exibe a Imagem redimensionada proporcionalmente para caber 100% no quadro -->
@@ -82,7 +83,7 @@
                                    RenderOptions.BitmapScalingMode="HighQuality"/>
 
                             <!-- Fallback em texto quando não há imagem -->
-                            <TextBlock Text="Sem Imagem de Preview" 
+                            <TextBlock Text="{helpers:Loc TextNoPreviewImage}" 
                                        HorizontalAlignment="Center" 
                                        VerticalAlignment="Center" 
                                        Foreground="#64748B" 
@@ -103,20 +104,20 @@
                 </GroupBox>
 
                 <!-- 2. Detalhes & Edição -->
-                <GroupBox Header="Edição da Livery Selecionada" Grid.Row="1" Margin="0,0,0,8" Foreground="White">
+                <GroupBox Header="{helpers:Loc TextSelectedLivery}" Grid.Row="1" Margin="0,0,0,8" Foreground="White">
                     <StackPanel Margin="6">
-                        <TextBlock Text="Título no Simulador:" Margin="0,0,0,4" Foreground="White"/>
+                        <TextBlock Text="{helpers:Loc TextInputTitleSimulator}" Margin="0,0,0,4" Foreground="White"/>
                         <TextBox Text="{Binding EditTitleText, UpdateSourceTrigger=PropertyChanged}" Padding="4" Margin="0,0,0,8"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="Salvar Título" Command="{Binding SaveTitleCommand}" Padding="10,4" Margin="0,0,6,0"/>
-                            <Button Content="Remover Livery" Command="{Binding DeleteSelectedLiveryCommand}" Background="#EF4444" Foreground="White" Padding="10,4"/>
+                            <Button Content="{helpers:Loc BtnSaveTitle}" Command="{Binding SaveTitleCommand}" Padding="10,4" Margin="0,0,6,0"/>
+                            <Button Content="{helpers:Loc BtnRemoveLivery}" Command="{Binding DeleteSelectedLiveryCommand}" Background="#EF4444" Foreground="White" Padding="10,4"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
                 <!-- 3. Drop zone .PTP / .ZIP e Conversor -->
-                <GroupBox Header="Instalar / Converter Livery (.PTP / .ZIP)" Grid.Row="2" Foreground="White">
+                <GroupBox Header="{helpers:Loc TextInstallConvertLivery}" Grid.Row="2" Foreground="White">
                     <Grid Background="#F8FAFC">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -125,10 +126,10 @@
                         <Border BorderBrush="#CBD5E1" BorderThickness="2" CornerRadius="6" Margin="8,8,8,4">
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <TextBlock Text="📦" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                                <TextBlock Text="Arraste o arquivo .PTP ou .ZIP aqui para instalar" TextAlignment="Center" FontWeight="SemiBold" Foreground="#475569"/>
+                                <TextBlock Text="{helpers:Loc TextDragFilePtpZip}" TextAlignment="Center" FontWeight="SemiBold" Foreground="#475569"/>
                             </StackPanel>
                         </Border>
-                        <Button Grid.Row="1" Content="🔄 Converter .PTP para .ZIP" Command="{Binding ConvertPtpToZipCommand}" 
+                        <Button Grid.Row="1" Content="{helpers:Loc BtnConvertPtpToZip}" Command="{Binding ConvertPtpToZipCommand}" 
                                 Margin="8,4,8,8" Padding="10,6" Background="#0284C7" Foreground="White" FontWeight="SemiBold"/>
                     </Grid>
                 </GroupBox>
