@@ -1,4 +1,5 @@
 using AircraftSimManager.Data.Models;
+using AircraftSimManager.Shared.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +70,35 @@ namespace AircraftSimManager.Data.Services
 				var extractResult = await _extractorService.ExtractPtpAsync(ptpFilePath, tempExtractPath, progress);
 				if (!extractResult.Success)
 				{
+					string errorMsg = string.Format(TranslationSource.Instance["ErrorExtraction"], extractResult.Message);
+					progress?.Report(errorMsg);
+					return false;
+				}
+
+				return await Task.Run(() => ProcessMsfsExtractedPackage(tempExtractPath, communityPath, progress));
+			}
+			catch (Exception ex)
+			{
+				string errorMsg = string.Format(TranslationSource.Instance["ErrorMsfsInstallation"], ex.Message);
+				progress?.Report(errorMsg);
+				return false;
+			}
+			finally
+			{
+				if (Directory.Exists(tempExtractPath))
+				{
+					try { Directory.Delete(tempExtractPath, true); } catch { }
+				}
+			}
+		}
+		/*private async Task<bool> InstallPtpForMsfsAsync(string ptpFilePath, string communityPath, IProgress<string>? progress = null)
+		{
+			string tempExtractPath = Path.Combine(Path.GetTempPath(), "PmdgPtp_" + Guid.NewGuid().ToString("N"));
+			try
+			{
+				var extractResult = await _extractorService.ExtractPtpAsync(ptpFilePath, tempExtractPath, progress);
+				if (!extractResult.Success)
+				{
 					progress?.Report($"Erro na extração: {extractResult.Message}");
 					return false;
 				}
@@ -87,9 +117,36 @@ namespace AircraftSimManager.Data.Services
 					try { Directory.Delete(tempExtractPath, true); } catch { }
 				}
 			}
-		}
+		}*/
 
 		private async Task<bool> InstallZipForMsfsAsync(string zipFilePath, string communityPath, IProgress<string>? progress = null)
+		{
+			string tempExtractPath = Path.Combine(Path.GetTempPath(), "PmdgZip_" + Guid.NewGuid().ToString("N"));
+			try
+			{
+				string fileName = Path.GetFileName(zipFilePath);
+				string progressMsg = string.Format(TranslationSource.Instance["ProgressUnpackingZip"], fileName);
+				progress?.Report(progressMsg);
+
+				await Task.Run(() => ZipFile.ExtractToDirectory(zipFilePath, tempExtractPath));
+
+				return await Task.Run(() => ProcessMsfsExtractedPackage(tempExtractPath, communityPath, progress));
+			}
+			catch (Exception ex)
+			{
+				string errorMsg = string.Format(TranslationSource.Instance["ErrorMsfsZipInstallation"], ex.Message);
+				progress?.Report(errorMsg);
+				return false;
+			}
+			finally
+			{
+				if (Directory.Exists(tempExtractPath))
+				{
+					try { Directory.Delete(tempExtractPath, true); } catch { }
+				}
+			}
+		}
+		/*private async Task<bool> InstallZipForMsfsAsync(string zipFilePath, string communityPath, IProgress<string>? progress = null)
 		{
 			string tempExtractPath = Path.Combine(Path.GetTempPath(), "PmdgZip_" + Guid.NewGuid().ToString("N"));
 			try
@@ -111,9 +168,31 @@ namespace AircraftSimManager.Data.Services
 					try { Directory.Delete(tempExtractPath, true); } catch { }
 				}
 			}
-		}
+		}*/
 
 		private bool ProcessMsfsExtractedPackage(string tempExtractPath, string communityPath, IProgress<string>? progress = null)
+		{
+			string? layoutFile = Directory.GetFiles(tempExtractPath, "layout.json", SearchOption.AllDirectories).FirstOrDefault();
+
+			if (layoutFile != null)
+			{
+				string packageSourceDir = Path.GetDirectoryName(layoutFile)!;
+				string packageFolderName = new DirectoryInfo(packageSourceDir).Name;
+
+				string targetDir = Path.Combine(communityPath, packageFolderName);
+
+				string copyMsg = string.Format(TranslationSource.Instance["ProgressCopyingFiles"], targetDir);
+				progress?.Report(copyMsg);
+				CopyDirectory(packageSourceDir, targetDir);
+
+				progress?.Report(TranslationSource.Instance["ProgressUpdatingLayout"]);
+				RebuildMsfsLayoutJson(targetDir);
+				return true;
+			}
+
+			return false;
+		}
+		/*private bool ProcessMsfsExtractedPackage(string tempExtractPath, string communityPath, IProgress<string>? progress = null)
 		{
 			string? layoutFile = Directory.GetFiles(tempExtractPath, "layout.json", SearchOption.AllDirectories).FirstOrDefault();
 
@@ -133,7 +212,7 @@ namespace AircraftSimManager.Data.Services
 			}
 
 			return false;
-		}
+		}*/
 
 		public static void RebuildMsfsLayoutJson(string rootPackageFolder)
 		{
@@ -189,6 +268,35 @@ namespace AircraftSimManager.Data.Services
 				var extractResult = await _extractorService.ExtractPtpAsync(ptpFilePath, tempExtractPath, progress);
 				if (!extractResult.Success)
 				{
+					string errorMsg = string.Format(TranslationSource.Instance["ErrorExtraction"], extractResult.Message);
+					progress?.Report(errorMsg);
+					return false;
+				}
+
+				return await Task.Run(() => ProcessFsxExtractedPackage(tempExtractPath, airplanesPath, progress));
+			}
+			catch (Exception ex)
+			{
+				string errorMsg = string.Format(TranslationSource.Instance["ErrorInstallation"], ex.Message);
+				progress?.Report(errorMsg);
+				return false;
+			}
+			finally
+			{
+				if (Directory.Exists(tempExtractPath))
+				{
+					try { Directory.Delete(tempExtractPath, true); } catch { }
+				}
+			}
+		}
+		/*private async Task<bool> InstallPtpForFsxAsync(string ptpFilePath, string airplanesPath, SimulatorType simType, IProgress<string>? progress = null)
+		{
+			string tempExtractPath = Path.Combine(Path.GetTempPath(), "PmdgPtpFsx_" + Guid.NewGuid().ToString("N"));
+			try
+			{
+				var extractResult = await _extractorService.ExtractPtpAsync(ptpFilePath, tempExtractPath, progress);
+				if (!extractResult.Success)
+				{
 					progress?.Report($"Erro na extração: {extractResult.Message}");
 					return false;
 				}
@@ -207,9 +315,36 @@ namespace AircraftSimManager.Data.Services
 					try { Directory.Delete(tempExtractPath, true); } catch { }
 				}
 			}
-		}
+		}*/
 
 		private async Task<bool> InstallZipForFsxAsync(string zipFilePath, string airplanesPath, SimulatorType simType, IProgress<string>? progress = null)
+		{
+			string tempExtractPath = Path.Combine(Path.GetTempPath(), "PmdgZipFsx_" + Guid.NewGuid().ToString("N"));
+			try
+			{
+				string fileName = Path.GetFileName(zipFilePath);
+				string progressMsg = string.Format(TranslationSource.Instance["ProgressUnpackingZip"], fileName);
+				progress?.Report(progressMsg);
+
+				await Task.Run(() => ZipFile.ExtractToDirectory(zipFilePath, tempExtractPath));
+
+				return await Task.Run(() => ProcessFsxExtractedPackage(tempExtractPath, airplanesPath, progress));
+			}
+			catch (Exception ex)
+			{
+				string errorMsg = string.Format(TranslationSource.Instance["ErrorZipInstallation"], ex.Message);
+				progress?.Report(errorMsg);
+				return false;
+			}
+			finally
+			{
+				if (Directory.Exists(tempExtractPath))
+				{
+					try { Directory.Delete(tempExtractPath, true); } catch { }
+				}
+			}
+		}
+		/*private async Task<bool> InstallZipForFsxAsync(string zipFilePath, string airplanesPath, SimulatorType simType, IProgress<string>? progress = null)
 		{
 			string tempExtractPath = Path.Combine(Path.GetTempPath(), "PmdgZipFsx_" + Guid.NewGuid().ToString("N"));
 			try
@@ -231,9 +366,67 @@ namespace AircraftSimManager.Data.Services
 					try { Directory.Delete(tempExtractPath, true); } catch { }
 				}
 			}
-		}
+		}*/
 
 		private bool ProcessFsxExtractedPackage(string tempExtractPath, string airplanesPath, IProgress<string>? progress = null)
+		{
+			var textureDirs = Directory.GetDirectories(tempExtractPath, "texture.*", SearchOption.AllDirectories);
+			if (!textureDirs.Any())
+			{
+				progress?.Report(TranslationSource.Instance["ErrorNoTextureFoldersFound"]);
+				return false;
+			}
+
+			var pmdgAircraftFolders = GetPmdgAircraftFolders(airplanesPath);
+			if (!pmdgAircraftFolders.Any())
+			{
+				progress?.Report(TranslationSource.Instance["ErrorNoPmdgAircraftFound"]);
+				return false;
+			}
+
+			// 1. Tenta ler Settings.dat para saber a variante exata (ex: Variant=PMDG 737-800NGXu BW)
+			string? variant = ReadVariantFromSettings(tempExtractPath);
+
+			// 2. Localiza o arquivo de configuração (.cfg) extraído
+			string? cfgSnippetPath = Directory.GetFiles(tempExtractPath, "Config.cfg", SearchOption.AllDirectories).FirstOrDefault()
+								  ?? Directory.GetFiles(tempExtractPath, "*.cfg", SearchOption.AllDirectories).FirstOrDefault();
+
+			// 3. Localiza a pasta da aeronave correspondente
+			string? targetAircraftDir = FindTargetAircraftDirectory(variant, cfgSnippetPath, pmdgAircraftFolders);
+			if (string.IsNullOrEmpty(targetAircraftDir))
+			{
+				targetAircraftDir = pmdgAircraftFolders.First();
+			}
+
+			string installingMsg = string.Format(TranslationSource.Instance["ProgressInstallingAircraft"], Path.GetFileName(targetAircraftDir));
+			progress?.Report(installingMsg);
+
+			// 4. Copia as pastas de textura
+			foreach (var texDir in textureDirs)
+			{
+				string folderName = new DirectoryInfo(texDir).Name;
+				string destTexDir = Path.Combine(targetAircraftDir, folderName);
+
+				string copyingMsg = string.Format(TranslationSource.Instance["ProgressCopyingTextures"], folderName);
+				progress?.Report(copyingMsg);
+				CopyDirectory(texDir, destTexDir);
+			}
+
+			// 5. Adiciona entrada no aircraft.cfg
+			if (cfgSnippetPath != null && File.Exists(cfgSnippetPath))
+			{
+				string aircraftCfgPath = Path.Combine(targetAircraftDir, "aircraft.cfg");
+				progress?.Report(TranslationSource.Instance["ProgressRegisteringLivery"]);
+				AppendFltsimToAircraftCfg(aircraftCfgPath, cfgSnippetPath);
+			}
+
+			// 6. Copia Aircraft.ini (se houver) para a pasta PMDG Aircraft
+			TryInstallAircraftIni(tempExtractPath, airplanesPath, cfgSnippetPath, targetAircraftDir);
+
+			progress?.Report(TranslationSource.Instance["SuccessInstallation"]);
+			return true;
+		}
+		/*private bool ProcessFsxExtractedPackage(string tempExtractPath, string airplanesPath, IProgress<string>? progress = null)
 		{
 			var textureDirs = Directory.GetDirectories(tempExtractPath, "texture.*", SearchOption.AllDirectories);
 			if (!textureDirs.Any())
@@ -288,7 +481,7 @@ namespace AircraftSimManager.Data.Services
 
 			progress?.Report("Instalação concluída com sucesso!");
 			return true;
-		}
+		}*/
 
 		private string? ReadVariantFromSettings(string extractRoot)
 		{

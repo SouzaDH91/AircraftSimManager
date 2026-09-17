@@ -1,5 +1,5 @@
 ﻿using AircraftSimManager.Data.Services;
-using AircraftSimManager.Helpers;
+using AircraftSimManager.Shared.Helpers;
 using System.Configuration;
 using System.Data;
 using System.Globalization;

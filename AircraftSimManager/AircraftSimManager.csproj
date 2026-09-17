@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -14,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AircraftSimManager.Data\AircraftSimManager.Data.csproj" />
+    <ProjectReference Include="..\AircraftSimManager.Shared\AircraftSimManager.Shared.csproj" />
     <ProjectReference Include="..\AircraftSimManager.Utils\AircraftSimManager.Utils.csproj" />
   </ItemGroup>
 
@@ -21,22 +21,6 @@
     <None Update="Tools\PtpUnpacker\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Resources\AppResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>AppResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\AppResources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\AppResources_pt.resx" />
   </ItemGroup>
 
 </Project>

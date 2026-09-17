@@ -1,6 +1,6 @@
 using AircraftSimManager.Commands;
 using AircraftSimManager.Data.Services;
-using AircraftSimManager.Helpers;
+using AircraftSimManager.Shared.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Globalization;

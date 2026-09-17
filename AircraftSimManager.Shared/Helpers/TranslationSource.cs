@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Resources;
-using System.Threading;
 using System.Windows.Data;
 
-namespace AircraftSimManager.Helpers
+namespace AircraftSimManager.Shared.Helpers
 {
 	public class TranslationSource : INotifyPropertyChanged
 	{
@@ -15,8 +12,8 @@ namespace AircraftSimManager.Helpers
 
 		private static readonly Dictionary<string, ResourceManager> _resourceManagers = new(StringComparer.OrdinalIgnoreCase)
 		{
-			["en"] = new("AircraftSimManager.Resources.AppResources", typeof(TranslationSource).Assembly),
-			["pt"] = new("AircraftSimManager.Resources.AppResources_pt", typeof(TranslationSource).Assembly),
+			["en"] = new("AircraftSimManager.Shared.Resources.AppResources", typeof(TranslationSource).Assembly),
+			["pt"] = new("AircraftSimManager.Shared.Resources.AppResources_pt", typeof(TranslationSource).Assembly),
 		};
 
 		private CultureInfo currentCulture = new("pt-BR");

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace AircraftSimManager.Helpers
+namespace AircraftSimManager.Shared.Helpers
 {
 	public class LocExtension : Binding
 	{

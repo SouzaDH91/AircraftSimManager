@@ -1,15 +1,11 @@
 using AircraftSimManager.Data.Models;
 using AircraftSimManager.Data.Services;
+using AircraftSimManager.Shared.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using static AircraftSimManager.Utils.Enumerators;
 
@@ -43,7 +39,7 @@ namespace AircraftSimManager.ViewModels
 		private string editTitleText = string.Empty;
 
 		[ObservableProperty]
-		private string statusMessage = "Pronto";
+		private string statusMessage = TranslationSource.Instance["StatusReady"];
 
 		public LiveryManagerViewModel()
 		{
@@ -52,7 +48,7 @@ namespace AircraftSimManager.ViewModels
 
 		public async Task InitializeAsync()
 		{
-			StatusMessage = "Detectando simuladores instalados...";
+			StatusMessage = TranslationSource.Instance["StatusDetectingSimulators"];
 
 			var availableSimulators = await Task.Run(LoadAvailableSimulators);
 			Simulators = new ObservableCollection<SimulatorOption>(availableSimulators);
@@ -65,7 +61,7 @@ namespace AircraftSimManager.ViewModels
 			}
 			else
 			{
-				StatusMessage = "Nenhum simulador encontrado.";
+				StatusMessage = TranslationSource.Instance["StatusNoSimulatorFound"];
 			}
 		}
 
@@ -123,7 +119,7 @@ namespace AircraftSimManager.ViewModels
 			if (SelectedSimulator == null || string.IsNullOrWhiteSpace(AirplanesPath))
 				return;
 
-			StatusMessage = "Escaneando liveries...";
+			StatusMessage = TranslationSource.Instance["StatusScanningLiveries"];
 
 			string effectivePath = ResolveEffectivePath(AirplanesPath, SelectedSimulator.Type);
 
@@ -132,7 +128,8 @@ namespace AircraftSimManager.ViewModels
 			);
 
 			AircraftGroups = new ObservableCollection<AircraftGroup>(groups);
-			StatusMessage = $"{AircraftGroups.Sum(g => g.Liveries.Count)} liveries encontradas.";
+			int count = AircraftGroups.Sum(g => g.Liveries.Count);
+			StatusMessage = string.Format(TranslationSource.Instance["StatusLiveriesFound"], count);
 		}
 
 		[RelayCommand]
@@ -140,13 +137,18 @@ namespace AircraftSimManager.ViewModels
 		{
 			if (SelectedLivery == null)
 			{
-				StatusMessage = "Nenhuma livery selecionada para alterar o título.";
+				StatusMessage = TranslationSource.Instance["StatusNoLiverySelectedForTitle"];
 				return;
 			}
 
 			if (string.IsNullOrWhiteSpace(EditTitleText))
 			{
-				MessageBox.Show("O título não pode ficar em branco.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+				MessageBox.Show(
+					TranslationSource.Instance["MsgBlankTitleError"],
+					TranslationSource.Instance["DialogTitleWarning"],
+					MessageBoxButton.OK,
+					MessageBoxImage.Warning
+				);
 				return;
 			}
 
@@ -157,12 +159,12 @@ namespace AircraftSimManager.ViewModels
 			if (success)
 			{
 				SelectedLivery.Title = EditTitleText;
-				StatusMessage = $"Título atualizado para '{EditTitleText}' com sucesso!";
+				StatusMessage = string.Format(TranslationSource.Instance["StatusTitleUpdated"], EditTitleText);
 				await LoadLiveriesAsync();
 			}
 			else
 			{
-				StatusMessage = "Falha ao salvar o novo título no aircraft.cfg.";
+				StatusMessage = TranslationSource.Instance["StatusFailedToSaveTitle"];
 			}
 		}
 
@@ -171,20 +173,26 @@ namespace AircraftSimManager.ViewModels
 		{
 			if (SelectedLivery == null)
 			{
-				StatusMessage = "Nenhuma livery selecionada para remoção.";
+				StatusMessage = TranslationSource.Instance["StatusNoLiverySelectedForDelete"];
 				return;
 			}
 
+			string confirmMessage = string.Format(
+				TranslationSource.Instance["MsgConfirmDeleteLivery"],
+				SelectedLivery.Title,
+				SelectedLivery.TextureFolder
+			);
+
 			var result = MessageBox.Show(
-				$"Tem certeza que deseja remover a livery '{SelectedLivery.Title}'?\n\nA pasta '{SelectedLivery.TextureFolder}' será excluída permanentemente.",
-				"Confirmar Exclusão",
+				confirmMessage,
+				TranslationSource.Instance["DialogTitleConfirmDelete"],
 				MessageBoxButton.YesNo,
 				MessageBoxImage.Question
 			);
 
 			if (result != MessageBoxResult.Yes) return;
 
-			StatusMessage = $"Removendo '{SelectedLivery.Title}'...";
+			StatusMessage = string.Format(TranslationSource.Instance["StatusRemovingLivery"], SelectedLivery.Title);
 
 			bool success = await Task.Run(() =>
 				_scannerService.DeleteLivery(SelectedLivery.AircraftPath, SelectedLivery.TextureFolder)
@@ -194,12 +202,12 @@ namespace AircraftSimManager.ViewModels
 			{
 				SelectedLivery = null;
 				EditTitleText = string.Empty;
-				StatusMessage = "Livery removida com sucesso!";
+				StatusMessage = TranslationSource.Instance["StatusLiveryRemoved"];
 				await LoadLiveriesAsync();
 			}
 			else
 			{
-				StatusMessage = "Erro ao tentar remover a livery.";
+				StatusMessage = TranslationSource.Instance["StatusErrorRemovingLivery"];
 			}
 		}
 
@@ -208,8 +216,8 @@ namespace AircraftSimManager.ViewModels
 		{
 			var openDlg = new OpenFileDialog
 			{
-				Title = "Selecione o arquivo .PTP da PMDG",
-				Filter = "Arquivo PMDG Livery (*.ptp)|*.ptp|Todos os arquivos (*.*)|*.*"
+				Title = TranslationSource.Instance["DialogTitlePtpSelect"],
+				Filter = TranslationSource.Instance["FilterPtpFiles"]
 			};
 
 			if (openDlg.ShowDialog() != true) return;
@@ -219,28 +227,41 @@ namespace AircraftSimManager.ViewModels
 
 			var saveDlg = new SaveFileDialog
 			{
-				Title = "Salvar arquivo .ZIP convertido",
-				Filter = "Arquivo ZIP (*.zip)|*.zip",
+				Title = TranslationSource.Instance["DialogTitleZipSave"],
+				Filter = TranslationSource.Instance["FilterZipFiles"],
 				FileName = defaultZipName
 			};
 
 			if (saveDlg.ShowDialog() != true) return;
 
 			string zipPath = saveDlg.FileName;
-			StatusMessage = $"Convertendo {Path.GetFileName(ptpPath)} para .ZIP...";
+			StatusMessage = string.Format(TranslationSource.Instance["StatusConvertingToZip"], Path.GetFileName(ptpPath));
 
 			var progress = new Progress<string>(msg => StatusMessage = msg);
 			var (success, message) = await _ptpExtractorService.ConvertPtpToZipAsync(ptpPath, zipPath, progress);
 
 			if (success)
 			{
-				StatusMessage = $"Conversão concluída: {Path.GetFileName(zipPath)} criado!";
-				MessageBox.Show($"Arquivo .ZIP criado com sucesso em:\n{zipPath}", "Conversão Concluída", MessageBoxButton.OK, MessageBoxImage.Information);
+				StatusMessage = string.Format(TranslationSource.Instance["StatusConversionCompleted"], Path.GetFileName(zipPath));
+				string successBoxMsg = string.Format(TranslationSource.Instance["MsgZipCreatedSuccess"], zipPath);
+
+				MessageBox.Show(
+					successBoxMsg,
+					TranslationSource.Instance["DialogTitleConversionCompleted"],
+					MessageBoxButton.OK,
+					MessageBoxImage.Information
+				);
 			}
 			else
 			{
-				StatusMessage = $"Erro na conversão: {message}";
-				MessageBox.Show(message, "Falha na Conversão", MessageBoxButton.OK, MessageBoxImage.Error);
+				StatusMessage = string.Format(TranslationSource.Instance["StatusConversionError"], message);
+
+				MessageBox.Show(
+					message,
+					TranslationSource.Instance["DialogTitleConversionFailed"],
+					MessageBoxButton.OK,
+					MessageBoxImage.Error
+				);
 			}
 		}
 
@@ -267,12 +288,12 @@ namespace AircraftSimManager.ViewModels
 		{
 			if (SelectedSimulator == null || string.IsNullOrWhiteSpace(AirplanesPath))
 			{
-				StatusMessage = "Erro: Nenhum simulador ou caminho selecionado.";
+				StatusMessage = TranslationSource.Instance["StatusErrorNoSimOrPath"];
 				return;
 			}
 
 			string fileName = Path.GetFileName(packagePath);
-			StatusMessage = $"Instalando {fileName}...";
+			StatusMessage = string.Format(TranslationSource.Instance["StatusInstallingPackage"], fileName);
 
 			string effectivePath = ResolveEffectivePath(AirplanesPath, SelectedSimulator.Type);
 			var progress = new Progress<string>(msg => StatusMessage = msg);
@@ -281,12 +302,12 @@ namespace AircraftSimManager.ViewModels
 
 			if (success)
 			{
-				StatusMessage = $"Livery '{fileName}' instalada com sucesso!";
+				StatusMessage = string.Format(TranslationSource.Instance["StatusLiveryInstalledSuccess"], fileName);
 				await LoadLiveriesAsync();
 			}
 			else
 			{
-				StatusMessage = $"Falha ao instalar a livery '{fileName}'. Verifique o arquivo.";
+				StatusMessage = string.Format(TranslationSource.Instance["StatusLiveryInstallFailed"], fileName);
 			}
 		}
 

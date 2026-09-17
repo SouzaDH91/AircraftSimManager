@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AircraftSimManager.ViewModels"
         xmlns:views="clr-namespace:AircraftSimManager.Views"
-        xmlns:helpers="clr-namespace:AircraftSimManager.Helpers"
+        xmlns:helpers="clr-namespace:AircraftSimManager.Shared.Helpers;assembly=AircraftSimManager.Shared"
         mc:Ignorable="d"
         Title="Aircraft Sim Manager" Height="1000" Width="1200"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E">

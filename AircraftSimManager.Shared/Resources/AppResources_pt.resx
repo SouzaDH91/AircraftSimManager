@@ -1,0 +1,444 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
+    <value>Início</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Ferramentas</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>Inglês</value>
+  </data>
+  <data name="PortugueseBr" xml:space="preserve">
+    <value>Português (BR)</value>
+  </data>
+  <data name="LiveriesManager" xml:space="preserve">
+    <value>Gerenciador de Texturas</value>
+  </data>
+  <data name="FuelCalculatorTitle" xml:space="preserve">
+    <value>Calculadora de Combustível</value>
+  </data>
+  <data name="PerformanceCalculator" xml:space="preserve">
+    <value>Calculadora de Performance</value>
+  </data>
+  <data name="DashboardSubtitle" xml:space="preserve">
+    <value>Selecione uma ferramenta no menu superior para começar.</value>
+  </data>
+  <data name="MainTextSelectTool" xml:space="preserve">
+    <value>Selecione uma ferramenta no menu superior para começar</value>
+  </data>
+  <data name="SimulatorSelectText" xml:space="preserve">
+    <value>Simulador</value>
+  </data>
+  <data name="PathSim" xml:space="preserve">
+    <value>Caminho</value>
+  </data>
+  <data name="BtnUpdate" xml:space="preserve">
+    <value>Atualizar</value>
+  </data>
+  <data name="TextInstalledLiveries" xml:space="preserve">
+    <value>Texturas Instaladas</value>
+  </data>
+  <data name="PreviewImage" xml:space="preserve">
+    <value>Pré-visualização</value>
+  </data>
+  <data name="TextNoPreviewImage" xml:space="preserve">
+    <value>Sem imagem de preview</value>
+  </data>
+  <data name="TextSelectedLivery" xml:space="preserve">
+    <value>Edição da Livery Selecionada</value>
+  </data>
+  <data name="TextInputTitleSimulator" xml:space="preserve">
+    <value>Título no simulador</value>
+  </data>
+  <data name="BtnSaveTitle" xml:space="preserve">
+    <value>Salvar Título</value>
+  </data>
+  <data name="BtnRemoveLivery" xml:space="preserve">
+    <value>Remover Textura</value>
+  </data>
+  <data name="TextInstallConvertLivery" xml:space="preserve">
+    <value>Instalar / Converter Textura (.PTP / .ZIP)</value>
+  </data>
+  <data name="TextDragFilePtpZip" xml:space="preserve">
+    <value>Arraste o arquivo .PTP ou .ZIP aqui para instalar</value>
+  </data>
+  <data name="BtnConvertPtpToZip" xml:space="preserve">
+    <value>Converter .PTP para .ZIP</value>
+  </data>
+  <data name="TextFuelPlanner" xml:space="preserve">
+    <value>Calculadora de Combustível</value>
+  </data>
+  <data name="DescTextAutomaticCalcDistance" xml:space="preserve">
+    <value>Cálculo automático de distância e distribuição nos tanques da aeronave.</value>
+  </data>
+  <data name="TextSelectAircraftModel" xml:space="preserve">
+    <value>Modelo da Aeronave</value>
+  </data>
+  <data name="TextFlightRoute" xml:space="preserve">
+    <value>Rota do Voo (ICAO)</value>
+  </data>
+  <data name="TextInputDeparture" xml:space="preserve">
+    <value>Partida</value>
+  </data>
+  <data name="TextInputArrival" xml:space="preserve">
+    <value>Chegada</value>
+  </data>
+  <data name="TextInputAlternative" xml:space="preserve">
+    <value>Alternativo</value>
+  </data>
+  <data name="TextCalculatedDistance" xml:space="preserve">
+    <value>Distância Calculada (NM)</value>
+  </data>
+  <data name="TextPassengersCargo" xml:space="preserve">
+    <value>Passageiros e Carga</value>
+  </data>
+  <data name="TextInputPassengers" xml:space="preserve">
+    <value>Passageiros (PAX)</value>
+  </data>
+  <data name="TextInputCargoHold" xml:space="preserve">
+    <value>Carga no porão</value>
+  </data>
+  <data name="BtnSaveFlightPlan" xml:space="preserve">
+    <value>Salvar Plano de Voo</value>
+  </data>
+  <data name="TextDistributionTanks" xml:space="preserve">
+    <value>Distribuição nos Tanques</value>
+  </data>
+  <data name="TextDrawLeftTank" xml:space="preserve">
+    <value>Tanq. Esquerdo</value>
+  </data>
+  <data name="TextDrawCenterTank" xml:space="preserve">
+    <value>Tanq. Central</value>
+  </data>
+  <data name="TextDrawRightTank" xml:space="preserve">
+    <value>Tanq. Direito</value>
+  </data>
+  <data name="TextSavedFlightHistory" xml:space="preserve">
+    <value>Histórico de Voos Salvos</value>
+  </data>
+  <data name="TextTableAircraft" xml:space="preserve">
+    <value>Aeronave</value>
+  </data>
+  <data name="TextTableDate" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="TextTableDeparture" xml:space="preserve">
+    <value>Partida</value>
+  </data>
+  <data name="TextTableArrival" xml:space="preserve">
+    <value>Chegada</value>
+  </data>
+  <data name="TextTableAlternative" xml:space="preserve">
+    <value>Alternativo</value>
+  </data>
+  <data name="TextTableDistance" xml:space="preserve">
+    <value>Distância</value>
+  </data>
+  <data name="TextTablePassengers" xml:space="preserve">
+    <value>Passageiros</value>
+  </data>
+  <data name="TextTableTotalFuel" xml:space="preserve">
+    <value>Combustível Total</value>
+  </data>
+  <data name="TextTableDeleteFlightHistory" xml:space="preserve">
+    <value>Excluir voo do histórico</value>
+  </data>
+  <data name="TextPROFeatures" xml:space="preserve">
+    <value>Recursos PRO</value>
+  </data>
+  <data name="DescTextPROFeatures" xml:space="preserve">
+    <value>Sincronize estes tanques diretamente com a aeronave no simulador via SimConnect!</value>
+  </data>
+  <data name="TextComingSoon" xml:space="preserve">
+    <value>Em Breve</value>
+  </data>
+  <data name="PerformanceCalculatorTitle" xml:space="preserve">
+    <value>Calculadora de Performance</value>
+  </data>
+  <data name="DescTextComingSoon" xml:space="preserve">
+    <value>Esta funcionalidade está em desenvolvimento e será disponibilizada em breve nas próximas atualizações do Aircraft Sim Manager!</value>
+  </data>
+  <data name="ErrorPtpNotFound" xml:space="preserve">
+    <value>Arquivo .ptp não encontrado</value>
+  </data>
+  <data name="ErrorUnpackerNotFound" xml:space="preserve">
+    <value>Executável PtpUnpack.exe não foi encontrado na pasta Tools/PtpUnpacker.</value>
+  </data>
+  <data name="ProgressStartingUnpack" xml:space="preserve">
+    <value>Iniciando descompactação de {0}...</value>
+  </data>
+  <data name="SuccessExtraction" xml:space="preserve">
+    <value>Extração concluída com sucesso.</value>
+  </data>
+  <data name="ErrorExtractionFailed" xml:space="preserve">
+    <value>Falha na extração (código {0}): {1}</value>
+  </data>
+  <data name="ErrorExecutingExtractor" xml:space="preserve">
+    <value>Erro ao executar extrator PTP: {0}</value>
+  </data>
+  <data name="ProgressGeneratingZip" xml:space="preserve">
+    <value>Gerando arquivo .ZIP...</value>
+  </data>
+  <data name="ProgressZipCreated" xml:space="preserve">
+    <value>Arquivo .ZIP gerado com sucesso: {0}</value>
+  </data>
+  <data name="SuccessZipCreated" xml:space="preserve">
+    <value>Arquivo .ZIP criado com sucesso em: {0}</value>
+  </data>
+  <data name="ErrorZipCompression" xml:space="preserve">
+    <value>Erro ao compactar para ZIP: {0}</value>
+  </data>
+  <data name="ErrorExtraction" xml:space="preserve">
+    <value>Erro na extração: {0}</value>
+  </data>
+  <data name="ErrorMsfsInstallation" xml:space="preserve">
+    <value>Erro na instalação MSFS: {0}</value>
+  </data>
+  <data name="ProgressUnpackingZip" xml:space="preserve">
+    <value>Descompactando ZIP {0}...</value>
+  </data>
+  <data name="ErrorMsfsZipInstallation" xml:space="preserve">
+    <value>Erro na instalação MSFS via ZIP: {0}</value>
+  </data>
+  <data name="ProgressCopyingFiles" xml:space="preserve">
+    <value>Copiando arquivos para {0}...</value>
+  </data>
+  <data name="ProgressUpdatingLayout" xml:space="preserve">
+    <value>Atualizando layout.json...</value>
+  </data>
+  <data name="ErrorInstallation" xml:space="preserve">
+    <value>Erro durante a instalação: {0}</value>
+  </data>
+  <data name="ErrorZipInstallation" xml:space="preserve">
+    <value>Erro durante a instalação via ZIP: {0}</value>
+  </data>
+  <data name="ErrorNoTextureFoldersFound" xml:space="preserve">
+    <value>Nenhuma pasta de textura encontrada no pacote.</value>
+  </data>
+  <data name="ErrorNoPmdgAircraftFound" xml:space="preserve">
+    <value>Nenhuma pasta de aeronave PMDG encontrada no diretório informado.</value>
+  </data>
+  <data name="ProgressInstallingAircraft" xml:space="preserve">
+    <value>Instalando na aeronave: {0}</value>
+  </data>
+  <data name="ProgressCopyingTextures" xml:space="preserve">
+    <value>Copiando texturas para {0}...</value>
+  </data>
+  <data name="ProgressRegisteringLivery" xml:space="preserve">
+    <value>Registrando livery no aircraft.cfg...</value>
+  </data>
+  <data name="SuccessInstallation" xml:space="preserve">
+    <value>Instalação concluída com sucesso!</value>
+  </data>
+  <data name="StatusReady" xml:space="preserve">
+    <value>Pronto</value>
+  </data>
+  <data name="StatusDetectingSimulators" xml:space="preserve">
+    <value>Detectando simuladores instalados...</value>
+  </data>
+  <data name="StatusNoSimulatorFound" xml:space="preserve">
+    <value>Nenhum simulador encontrado.</value>
+  </data>
+  <data name="StatusScanningLiveries" xml:space="preserve">
+    <value>Escaneando liveries...</value>
+  </data>
+  <data name="StatusLiveriesFound" xml:space="preserve">
+    <value>{0} liveries encontradas.</value>
+  </data>
+  <data name="StatusNoLiverySelectedForTitle" xml:space="preserve">
+    <value>Nenhuma livery selecionada para alterar o título.</value>
+  </data>
+  <data name="StatusTitleUpdated" xml:space="preserve">
+    <value>Título atualizado para '{0}' com sucesso!</value>
+  </data>
+  <data name="StatusFailedToSaveTitle" xml:space="preserve">
+    <value>Falha ao salvar o novo título no aircraft.cfg.</value>
+  </data>
+  <data name="StatusNoLiverySelectedForDelete" xml:space="preserve">
+    <value>Nenhuma livery selecionada para remoção.</value>
+  </data>
+  <data name="StatusRemovingLivery" xml:space="preserve">
+    <value>Removendo '{0}'...</value>
+  </data>
+  <data name="StatusLiveryRemoved" xml:space="preserve">
+    <value>Livery removida com sucesso!</value>
+  </data>
+  <data name="StatusErrorRemovingLivery" xml:space="preserve">
+    <value>Erro ao tentar remover a livery.</value>
+  </data>
+  <data name="StatusConvertingToZip" xml:space="preserve">
+    <value>Convertendo {0} para .ZIP...</value>
+  </data>
+  <data name="StatusConversionCompleted" xml:space="preserve">
+    <value>Conversão concluída: {0} criado!</value>
+  </data>
+  <data name="StatusConversionError" xml:space="preserve">
+    <value>Erro na conversão: {0}</value>
+  </data>
+  <data name="StatusErrorNoSimOrPath" xml:space="preserve">
+    <value>Erro: Nenhum simulador ou caminho selecionado.</value>
+  </data>
+  <data name="StatusInstallingPackage" xml:space="preserve">
+    <value>Instalando {0}...</value>
+  </data>
+  <data name="StatusLiveryInstalledSuccess" xml:space="preserve">
+    <value>Livery '{0}' instalada com sucesso!</value>
+  </data>
+  <data name="StatusLiveryInstallFailed" xml:space="preserve">
+    <value>Falha ao instalar a livery '{0}'. Verifique o arquivo.</value>
+  </data>
+  <data name="MsgBlankTitleError" xml:space="preserve">
+    <value>O título não pode ficar em branco.</value>
+  </data>
+  <data name="MsgConfirmDeleteLivery" xml:space="preserve">
+    <value>Tem certeza que deseja remover a livery '{0}'?\n\nA pasta '{1}' será excluída permanentemente.</value>
+  </data>
+  <data name="MsgZipCreatedSuccess" xml:space="preserve">
+    <value>Arquivo .ZIP criado com sucesso em:\n{0}</value>
+  </data>
+  <data name="DialogTitleWarning" xml:space="preserve">
+    <value>Aviso</value>
+  </data>
+  <data name="DialogTitleConfirmDelete" xml:space="preserve">
+    <value>Confirmar Exclusão</value>
+  </data>
+  <data name="DialogTitlePtpSelect" xml:space="preserve">
+    <value>Selecione o arquivo .PTP da PMDG</value>
+  </data>
+  <data name="DialogTitleZipSave" xml:space="preserve">
+    <value>Salvar arquivo .ZIP convertido</value>
+  </data>
+  <data name="DialogTitleConversionCompleted" xml:space="preserve">
+    <value>Conversão Concluída</value>
+  </data>
+  <data name="DialogTitleConversionFailed" xml:space="preserve">
+    <value>Falha na Conversão</value>
+  </data>
+  <data name="FilterPtpFiles" xml:space="preserve">
+    <value>*.ptp</value>
+  </data>
+  <data name="FilterZipFiles" xml:space="preserve">
+    <value>*.zip`</value>
+  </data>
+</root>

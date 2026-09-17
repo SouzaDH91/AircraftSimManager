@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:helpers="clr-namespace:AircraftSimManager.Shared.Helpers;assembly=AircraftSimManager.Shared"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1000">
 
@@ -134,8 +135,8 @@
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Text="Calculadora de Combustível (Fuel Planner)" FontSize="22" FontWeight="Bold" Foreground="White"/>
-                <TextBlock Text="Cálculo automático de distância e distribuição nos tanques da aeronave." FontSize="13" Foreground="#888888"/>
+                <TextBlock Text="{helpers:Loc TextFuelPlanner}" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="{helpers:Loc DescTextAutomaticCalcDistance}" FontSize="13" Foreground="#888888"/>
             </StackPanel>
         </DockPanel>
 
@@ -154,7 +155,7 @@
                     <!-- Modelo da Aeronave com Estilo Escuro Aplicado -->
                     <Border Background="#252526" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="✈️ Modelo da Aeronave" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
+                            <TextBlock Text="{helpers:Loc TextSelectAircraftModel}" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
                             <ComboBox Style="{StaticResource DarkComboBoxStyle}"
                                       ItemsSource="{Binding AvailableAircraft}"
                                       SelectedItem="{Binding SelectedAircraft}"
@@ -166,7 +167,7 @@
                     <!-- Rota do Voo -->
                     <Border Background="#252526" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="🌐 Rota do Voo (ICAO)" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,10"/>
+                            <TextBlock Text="{helpers:Loc TextFlightRoute}" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,10"/>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -176,20 +177,20 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Origem:" Foreground="White" FontSize="11"/>
+                                    <TextBlock Text="{helpers:Loc TextInputDeparture}" Foreground="White" FontSize="11"/>
                                     <TextBox Text="{Binding OriginIcao, UpdateSourceTrigger=PropertyChanged}" MaxLength="4" CharacterCasing="Upper" Background="#1E1E1E" Foreground="White" Padding="5" FontWeight="Bold" HorizontalContentAlignment="Center"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
-                                    <TextBlock Text="Destino:" Foreground="White" FontSize="11"/>
+                                    <TextBlock Text="{helpers:Loc TextInputArrival}" Foreground="White" FontSize="11"/>
                                     <TextBox Text="{Binding DestinationIcao, UpdateSourceTrigger=PropertyChanged}" MaxLength="4" CharacterCasing="Upper" Background="#1E1E1E" Foreground="White" Padding="5" FontWeight="Bold" HorizontalContentAlignment="Center"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="4">
-                                    <TextBlock Text="Alternativo:" Foreground="White" FontSize="11"/>
+                                    <TextBlock Text="{helpers:Loc TextInputAlternative}" Foreground="White" FontSize="11"/>
                                     <TextBox Text="{Binding AlternateIcao, UpdateSourceTrigger=PropertyChanged}" MaxLength="4" CharacterCasing="Upper" Background="#1E1E1E" Foreground="White" Padding="5" FontWeight="Bold" HorizontalContentAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
 
-                            <TextBlock Text="Distância Calculada (NM):" Foreground="White" FontSize="11" Margin="0,5,0,3"/>
+                            <TextBlock Text="{helpers:Loc TextCalculatedDistance}" Foreground="White" FontSize="11" Margin="0,5,0,3"/>
                             <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="4" Padding="6">
                                 <TextBlock Text="{Binding FlightDistanceNM, StringFormat='{}{0:N0} NM'}" Foreground="#4EC9B0" FontWeight="Bold" FontSize="13"/>
                             </Border>
@@ -199,16 +200,16 @@
                     <!-- Carga & Consumo -->
                     <Border Background="#252526" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="👥 Carga &amp; Consumo" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,10"/>
-                            <TextBlock Text="Passageiros (PAX):" Foreground="White" FontSize="11"/>
+                            <TextBlock Text="{helpers:Loc TextPassengersCargo}" FontSize="15" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,10"/>
+                            <TextBlock Text="{helpers:Loc TextInputPassengers}" Foreground="White" FontSize="11"/>
                             <TextBox Text="{Binding PassengerCount, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="White" Padding="5" Margin="0,0,0,8"/>
 
-                            <TextBlock Text="Carga no Porão (Cargo):" Foreground="White" FontSize="11"/>
+                            <TextBlock Text="{helpers:Loc TextInputCargoHold}" Foreground="White" FontSize="11"/>
                             <TextBox Text="{Binding CargoWeightKg, UpdateSourceTrigger=PropertyChanged}" Background="#1E1E1E" Foreground="White" Padding="5"/>
                         </StackPanel>
                     </Border>
 
-                    <Button Command="{Binding SaveFlightCommand}" Content="💾 Salvar Planejamento" Background="#007ACC" Foreground="White" FontWeight="Bold" Padding="10" BorderThickness="0" Cursor="Hand">
+                    <Button Command="{Binding SaveFlightCommand}" Content="{helpers:Loc BtnSaveFlightPlan}" Background="#007ACC" Foreground="White" FontWeight="Bold" Padding="10" BorderThickness="0" Cursor="Hand">
                         <Button.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="6"/>
@@ -229,7 +230,7 @@
                     <DockPanel Grid.Row="0">
                         <TextBlock Text="{Binding TotalBlockFuelDisplay, StringFormat='TOTAL: {0:N0}'}" Foreground="#4EC9B0" FontSize="18" FontWeight="Bold" DockPanel.Dock="Right"/>
                         <TextBlock Text="{Binding UnitLabel, StringFormat=' ({0})'}" Foreground="#4EC9B0" FontSize="18" FontWeight="Bold" DockPanel.Dock="Right"/>
-                        <TextBlock Text="⛽ Distribuição nos Tanques" FontSize="16" FontWeight="Bold" Foreground="#007ACC"/>
+                        <TextBlock Text="{helpers:Loc TextDistributionTanks}" FontSize="16" FontWeight="Bold" Foreground="#007ACC"/>
                     </DockPanel>
 
                     <Viewbox Grid.Row="1" Margin="10">
@@ -239,7 +240,7 @@
 
                             <Border Canvas.Left="186" Canvas.Top="55" Width="28" Height="90" Background="#141414" CornerRadius="12" BorderBrush="#333333" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="💺 PAX" Foreground="#888888" FontSize="7" HorizontalAlignment="Center" Margin="0,2,0,2"/>
+                                    <TextBlock Text="PAX" Foreground="#888888" FontSize="7" HorizontalAlignment="Center" Margin="0,2,0,2"/>
                                     <Border Width="20" Height="6" Background="#333333" CornerRadius="3" Margin="0,1">
                                         <ProgressBar Value="{Binding PaxOccupancyPercentage, Mode=OneWay}" Height="6" Foreground="#4EC9B0" Background="Transparent" BorderThickness="0"/>
                                     </Border>
@@ -248,9 +249,9 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Canvas.Left="186" Canvas.Top="150" Width="28" Height="65" Background="#141414" CornerRadius="4" BorderBrush="#333333" BorderThickness="1">
+                            <Border Canvas.Left="186" Canvas.Top="180" Width="28" Height="65" Background="#141414" CornerRadius="4" BorderBrush="#333333" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="📦 CARGO" Foreground="#888888" FontSize="7" HorizontalAlignment="Center" Margin="0,2,0,2"/>
+                                    <TextBlock Text="CARGO" Foreground="#888888" FontSize="5" HorizontalAlignment="Center" Margin="0,2,0,2"/>
                                     <Border Width="20" Height="6" Background="#333333" CornerRadius="3" Margin="0,1">
                                         <ProgressBar Value="{Binding CargoOccupancyPercentage, Mode=OneWay}" Height="6" Foreground="#FFD700" Background="Transparent" BorderThickness="0"/>
                                     </Border>
@@ -261,25 +262,25 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Canvas.Left="55" Canvas.Top="145" Background="#2D2D30" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="5" Padding="5">
+                            <Border Canvas.Left="55" Canvas.Top="145" Width="80" Background="#2D2D30" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="5" Padding="5">
                                 <StackPanel>
-                                    <TextBlock Text="LEFT TANK" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{helpers:Loc TextDrawLeftTank}" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding LeftTankFuelDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding UnitLabel}" Foreground="#007ACC" FontSize="9" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Canvas.Left="150" Canvas.Top="120" Width="100" Background="#2D2D30" BorderBrush="#FFD700" BorderThickness="2" CornerRadius="5" Padding="5" Panel.ZIndex="10">
+                            <Border Canvas.Left="150" Canvas.Top="130" Width="100" Background="#2D2D30" BorderBrush="#FFD700" BorderThickness="2" CornerRadius="5" Padding="5" Panel.ZIndex="10">
                                 <StackPanel>
-                                    <TextBlock Text="CENTER TANK" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{helpers:Loc TextDrawCenterTank}" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding CenterTankFuelDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding UnitLabel}" Foreground="#FFD700" FontSize="9" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Canvas.Left="265" Canvas.Top="145" Background="#2D2D30" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="5" Padding="5">
+                            <Border Canvas.Left="265" Canvas.Top="145" Width="80" Background="#2D2D30" BorderBrush="#007ACC" BorderThickness="2" CornerRadius="5" Padding="5">
                                 <StackPanel>
-                                    <TextBlock Text="RIGHT TANK" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{helpers:Loc TextDrawRightTank}" Foreground="#888888" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding RightTankFuelDisplay, StringFormat='{}{0:N0}'}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding UnitLabel}" Foreground="#007ACC" FontSize="9" HorizontalAlignment="Center"/>
                                 </StackPanel>
@@ -298,7 +299,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="📜 Histórico de Voos Salvos" FontSize="14" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
+                <TextBlock Text="{helpers:Loc TextSavedFlightHistory}" FontSize="14" FontWeight="Bold" Foreground="#007ACC" Margin="0,0,0,8"/>
 
                 <DataGrid Grid.Row="1" 
                           ItemsSource="{Binding FlightHistory}" 
@@ -327,14 +328,14 @@
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Aircraft" Binding="{Binding AircraftName}" Width="130"/>
-                        <DataGridTextColumn Header="Data" Binding="{Binding DateCalculated}" Width="130"/>
-                        <DataGridTextColumn Header="Origem" Binding="{Binding Origin}" Width="70"/>
-                        <DataGridTextColumn Header="Destino" Binding="{Binding Destination}" Width="70"/>
-                        <DataGridTextColumn Header="Alternativo" Binding="{Binding Alternate}" Width="90"/>
-                        <DataGridTextColumn Header="Distância" Binding="{Binding DistanceNM, StringFormat='{}{0:N0} NM'}" Width="90"/>
-                        <DataGridTextColumn Header="Passageiros" Binding="{Binding Passengers}" Width="90"/>
-                        <DataGridTextColumn Header="Combustível Total" Binding="{Binding TotalFuelKg, StringFormat='{}{0:N0} kg'}" Width="*"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableAircraft}" Binding="{Binding AircraftName}" Width="130"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableDate}" Binding="{Binding DateCalculated}" Width="130"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableDeparture}" Binding="{Binding Origin}" Width="70"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableArrival}" Binding="{Binding Destination}" Width="70"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableAlternative}" Binding="{Binding Alternate}" Width="90"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableDistance}" Binding="{Binding DistanceNM, StringFormat='{}{0:N0} NM'}" Width="90"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTablePassengers}" Binding="{Binding Passengers}" Width="90"/>
+                        <DataGridTextColumn Header="{helpers:Loc TextTableTotalFuel}" Binding="{Binding TotalFuelKg, StringFormat='{}{0:N0} kg'}" Width="*"/>
 
                         <!-- Coluna de Ações com Botão Deletar -->
                         <DataGridTemplateColumn Width="50">
@@ -347,7 +348,7 @@
                                             Foreground="#FF6B6B" 
                                             BorderThickness="0" 
                                             Cursor="Hand" 
-                                            ToolTip="Excluir voo do histórico"/>
+                                            ToolTip="{helpers:Loc TextTableDeleteFlightHistory}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -359,8 +360,8 @@
         <!-- Banner PRO -->
         <Border Grid.Row="3" Background="#2D2D30" CornerRadius="8" Padding="10" Margin="0,10,0,0">
             <DockPanel>
-                <TextBlock Text="💎 Recursos PRO:" FontWeight="Bold" Foreground="#FFD700"/>
-                <TextBlock Text=" Sincronize estes tanques diretamente com a aeronave no simulador via SimConnect!" Foreground="#CCCCCC" Margin="5,0,0,0"/>
+                <TextBlock Text="{helpers:Loc TextPROFeatures, StringFormat='💎 {0}: '}" FontWeight="Bold" Foreground="#FFD700"/>
+                <TextBlock Text="{helpers:Loc DescTextPROFeatures}" Foreground="#CCCCCC" Margin="5,0,0,0"/>
             </DockPanel>
         </Border>
     </Grid>
