@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -14,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AircraftSimManager.Data\AircraftSimManager.Data.csproj" />
+    <ProjectReference Include="..\AircraftSimManager.Shared\AircraftSimManager.Shared.csproj" />
     <ProjectReference Include="..\AircraftSimManager.Utils\AircraftSimManager.Utils.csproj" />
   </ItemGroup>
 

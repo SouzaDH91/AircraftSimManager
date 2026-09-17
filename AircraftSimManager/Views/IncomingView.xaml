@@ -3,14 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:helpers="clr-namespace:AircraftSimManager.Shared.Helpers;assembly=AircraftSimManager.Shared"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Border Background="#2D2D30" CornerRadius="8" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" Width="520">
             <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="🚀 EM BREVE (IN COMING)" Foreground="#007ACC" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                <TextBlock Text="{helpers:Loc TextComingSoon, StringFormat='🚀 {0}:'}" Foreground="#007ACC" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
                 <TextBlock Text="{Binding FeatureName}" Foreground="White" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                <TextBlock Text="Esta funcionalidade está em desenvolvimento e será disponibilizada em breve nas próximas atualizações do Aircraft Sim Manager!" 
+                <TextBlock Text="{helpers:Loc DescTextComingSoon}" 
                            Foreground="#CCCCCC" FontSize="14" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,20"/>
             </StackPanel>
         </Border>

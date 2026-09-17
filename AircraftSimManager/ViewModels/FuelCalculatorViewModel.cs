@@ -26,8 +26,8 @@ namespace AircraftSimManager.ViewModels
 		private string _alternateIcao;
 
 		private double _flightDistanceNM;
-		private double _passengerCount = 132;
-		private double _cargoWeightKg = 1200;
+		private double _passengerCount;
+		private double _cargoWeightKg;
 
 		private bool _isLbsSelected;
 		private double _totalBlockFuelKg;

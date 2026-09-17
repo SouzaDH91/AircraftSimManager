@@ -12,6 +12,7 @@ namespace AircraftSimManager.Data.Services
 		private readonly string _configFilePath;
 
 		public string WeightUnit { get; set; } = "KG"; // Padrão
+		public string Language { get; set; } = "pt-BR"; // Padrão
 
 		public ConfigService()
 		{
@@ -29,9 +30,19 @@ namespace AircraftSimManager.Data.Services
 				foreach (var line in lines)
 				{
 					var parts = line.Split('=');
-					if (parts.Length == 2 && parts[0].Trim() == "WeightUnit")
+					if (parts.Length == 2)
 					{
-						WeightUnit = parts[1].Trim().ToUpper() == "LBS" ? "LBS" : "KG";
+						string key = parts[0].Trim();
+						string value = parts[1].Trim();
+
+						if (key == "WeightUnit")
+						{
+							WeightUnit = value.ToUpper() == "LBS" ? "LBS" : "KG";
+						}
+						else if (key == "Language")
+						{
+							Language = string.IsNullOrWhiteSpace(value) ? "pt-BR" : value;
+						}
 					}
 				}
 			}
@@ -39,7 +50,12 @@ namespace AircraftSimManager.Data.Services
 
 		public void SaveSettings()
 		{
-			string[] lines = { $"WeightUnit={WeightUnit}" };
+			string[] lines =
+			{
+			$"WeightUnit={WeightUnit}",
+			$"Language={Language}"
+		};
+
 			File.WriteAllLines(_configFilePath, lines);
 		}
 	}

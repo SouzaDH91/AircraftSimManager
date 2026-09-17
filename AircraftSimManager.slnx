@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="AircraftSimManager.Data/AircraftSimManager.Data.csproj" />
+  <Project Path="AircraftSimManager.Shared/AircraftSimManager.Shared.csproj" Id="a098af7a-6c43-4066-af3c-70361df66c84" />
   <Project Path="AircraftSimManager.Utils/AircraftSimManager.Utils.csproj" />
   <Project Path="AircraftSimManager/AircraftSimManager.csproj" />
 </Solution>
